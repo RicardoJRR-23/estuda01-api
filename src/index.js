@@ -16,9 +16,9 @@ const main = async () => {
 
   app.use(express.json());
 
-  app.use(private_routes);
-
   app.use(public_routes);
+  
+  app.use(private_routes);
 
   const swagger_specs = swaggerJSDoc(swagger_options);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swagger_specs));
