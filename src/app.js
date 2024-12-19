@@ -1,9 +1,11 @@
 const express = require('express');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-
+const path = require('path')
 if (process.env.NODE_ENV !== 'test') {
   require('dotenv').config();
+} else {
+  require('dotenv').config({ path: path.join(process.cwd(), './.env.example') });
 }
 
 const swagger_options = require('./swagger');

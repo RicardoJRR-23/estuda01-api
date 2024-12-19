@@ -2,17 +2,17 @@ const express = require('express');
 const router = express.Router();
 
 const create_schema = require('./create_schema');
-const Controller = require('../../../controllers/UserController');
+const Controller = require('../../../controllers/SessionController');
 const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMiddleware');
 
 /**
  * @swagger
- * /users:
+ * /sessions:
  *   post:
- *     summary: User creation
- *     description: Endpoint responsible to create a user on the system.
+ *     summary: Create a user session
+ *     description: Validates user credentials and generates an access token for authenticated sessions.
  *     tags:
- *       - Users
+ *       - Sessions
  *     requestBody:
  *       required: true
  *       content:
@@ -20,47 +20,31 @@ const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMid
  *           schema:
  *             type: object
  *             properties:
- *               name:
- *                 type: string
- *                 example: "João Silva"
  *               email:
  *                 type: string
  *                 format: email
- *                 example: "joao.silva@email.com"
+ *                 description: The email address of the user.
+ *                 example: user@example.com
  *               password:
  *                 type: string
  *                 format: password
- *                 example: "senha1234"
- *               role:
- *                 type: string
- *                 enum: [student, admin]
- *                 example: "student"
- *             required:
- *               - name
- *               - email
- *               - password
+ *                 min: 6
+ *                 description: The password of the user.
+ *                 example: password123
  *     responses:
- *       "201":
- *         description: User created with success
+ *       201:
+ *         description: Successfully created session and returned access token.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 id:
+ *                 access_token:
  *                   type: string
- *                   example: "123e4567-e89b-12d3-a456-426614174000"
- *                 name:
- *                   type: string
- *                   example: "João Silva"
- *                 email:
- *                   type: string
- *                   example: "joao.silva@email.com"
- *                 role:
- *                   type: string
- *                   example: "student"
- *       "400":
- *         description: Payload validation error.
+ *                   description: The generated access token for the session.
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       400:
+ *         description: Invalid input.
  *         content:
  *           application/json:
  *             schema:
@@ -68,9 +52,10 @@ const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMid
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Campo 'name' incorreto."
- *       "409":
- *         description: Conflict - duplicated email.
+ *                   description: Error message explaining the validation issue.
+ *                   example: "O email providenciado não é valido"
+ *       401:
+ *         description: Unauthorized. Invalid credentials provided.
  *         content:
  *           application/json:
  *             schema:
@@ -78,8 +63,9 @@ const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMid
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Este email já foi usado."
- *       "500":
+ *                   description: Error message explaining the issue.
+ *                   example: "Credenciais inválidas."
+ *       500:
  *         description: Internal server error.
  *         content:
  *           application/json:
@@ -88,11 +74,12 @@ const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMid
  *               properties:
  *                 error:
  *                   type: string
+ *                   description: Error message for unexpected server issues.
  *                   example: "Ocorreu um erro inesperado. Tente novamente mais tarde."
  */
 router.post('/',
   ValidateSchemaMiddleware(create_schema),
-  Controller.registerUser
-);
+  Controller.createSession
+)
 
 module.exports = router;
