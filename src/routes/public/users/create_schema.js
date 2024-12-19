@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { USER_ROLES } = require('../../utils/constants');
+const { USER_ROLES } = require('../../../utils/constants');
 
 module.exports = Joi.object({
   name: Joi
