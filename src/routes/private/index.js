@@ -1,6 +1,8 @@
-const express = require('express');
-const router = express.Router();
+const express = require("express")
+const router = express.Router()
+const cronogramaRoutes = require("./cronogram")
 
-// Define the public routes here using the router.use(<the path of the route>, <the route handler>)
+//Roteadores utilizados
+router.use("/cronogram", cronogramaRoutes);
 
-module.exports = router;
+module.exports = router
