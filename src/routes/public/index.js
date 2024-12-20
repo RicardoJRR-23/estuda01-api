@@ -1,6 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-// Define the private routes here using the router.use(<the path of the route>, <the route handler>)
+const users = require('./users');
+const sessions = require('./sessions');
+
+router.use('/users', users);
+
+router.use('/sessions', sessions);
 
 module.exports = router;
