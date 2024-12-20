@@ -5,7 +5,7 @@ const middleware = require('.');
 const app = require('../../app.js');
 const { dbConnect, dbDisconnect } = require('../../__helpers__/mongodbServer');
 
-describe('POST /sessions', () => {
+describe('AuthorizationMiddleware', () => {
   const user_payload = {
     name: 'Ricardo Rosário',
     email: 'ricardo@gmail.com',

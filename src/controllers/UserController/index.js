@@ -56,7 +56,54 @@ const registerUser = async (req, res) => {
   }
 };
 
+/**
+ * Handles the retrieval of a user's information.
+ * 
+ * This function checks if the user ID from the request matches either "me" or the ID
+ * of the currently authenticated user. If it doesn't match, a 403 Forbidden response 
+ * is returned. On success, the user's data is returned.
+ *
+ * @async
+ * @function getUser
+ * @param {Object} req - The request object from Express.js, containing:
+ *    - `params.userId`: The ID of the user requested (e.g., "me" or a specific ID).
+ *    - `user`: The authenticated user's information.
+ * @param {Object} res - The response object from Express.js used to send HTTP responses.
+ * @returns {Object} JSON response with the user's information or an error message.
+ */
+const getUser = async (req, res) => {
+  try {
+    // Extract the requested user ID from the route parameters.
+    const user_id = req.params.userId;
+
+    // Validate if the requested user ID is either "me" or matches the authenticated user's ID.
+    // If it doesn't match, return a 403 Forbidden response with an error message.
+    if (user_id !== 'me' && user_id !== req.user.id) {
+      return res.status(403).json({
+        error: 'O id do usuário ou é inválido ou não corresponde ao usuário autenticado.',
+      });
+    }
+
+    // If the validation passes, send back the user's information.
+    return res.status(200).json({
+      id: req.user.id,
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role,
+    });
+
+  } catch (error) {
+    // Log any unexpected errors to the server console for debugging purposes.
+    console.error('Unexpected Error: ', error);
+
+    // Respond with a 500 Internal Server Error and a generic error message.
+    return res.status(500).json({
+      error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.',
+    });
+  }
+};
 
 module.exports = {
-  registerUser
+  registerUser,
+  getUser
 }
