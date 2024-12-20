@@ -1,11 +1,20 @@
 const jwt = require('jsonwebtoken');
 
 /**
- * Error thrown when a provided JWT is invalid.
+ * Error thrown when a provided JWT is malformed.
  */
 class InvalidTokenError extends Error {
   constructor() {
     super('The token provided is Invalid.');
+  }
+}
+
+/**
+ * Error thrown when a provided JWT is expired.
+ */
+class ExpiredTokenError extends Error {
+  constructor() {
+    super('The token provided has expired.')
   }
 }
 
@@ -34,7 +43,14 @@ const verify = (token) => {
   let payload;
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, data) => {
     if (err) {
-      throw new InvalidTokenError();
+      if (err instanceof jwt.TokenExpiredError) {
+        throw new ExpiredTokenError();
+      }
+      else if (err instanceof jwt.JsonWebTokenError) {
+        throw new InvalidTokenError();
+      }
+      
+      throw err;
     }
 
     payload = data;
@@ -47,6 +63,7 @@ module.exports = {
   verify,
   generate,
   errors: {
-    InvalidTokenError
+    InvalidTokenError,
+    ExpiredTokenError
   }
 };

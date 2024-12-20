@@ -9,18 +9,23 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 const swagger_options = require('./swagger');
-const private_routes = require('./routes/private');
-const public_routes = require('./routes/public');
+
+const AuthorizationMiddleware = require('./middlewares/AuthorizationMiddleware');
+
+const privateRoutes = require('./routes/private');
+const publicRoutes = require('./routes/public');
 
 const app = express();
 
 app.use(express.json());
 
-app.use(public_routes);
-
-app.use(private_routes);
+app.use(publicRoutes);
 
 const swagger_specs = swaggerJSDoc(swagger_options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swagger_specs));
+
+app.use(AuthorizationMiddleware);
+
+app.use(privateRoutes);
 
 module.exports = app;
