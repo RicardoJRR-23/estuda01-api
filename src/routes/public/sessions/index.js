@@ -24,13 +24,13 @@ const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMid
  *                 type: string
  *                 format: email
  *                 description: The email address of the user.
- *                 example: user@example.com
+ *                 example: joao.silva@email.com
  *               password:
  *                 type: string
  *                 format: password
  *                 min: 6
  *                 description: The password of the user.
- *                 example: password123
+ *                 example: senha1234
  *     security: []
  *     responses:
  *       201:
