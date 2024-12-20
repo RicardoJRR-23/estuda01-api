@@ -39,6 +39,7 @@ const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMid
  *               - name
  *               - email
  *               - password
+ *     security: []
  *     responses:
  *       "201":
  *         description: User created with success

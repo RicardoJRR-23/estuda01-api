@@ -31,6 +31,7 @@ const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMid
  *                 min: 6
  *                 description: The password of the user.
  *                 example: password123
+ *     security: []
  *     responses:
  *       201:
  *         description: Successfully created session and returned access token.
