@@ -1,8 +1,11 @@
-const express = require('express');
-const router = express.Router();
+const express = require("express")
+const router = express.Router()
 
-const users = require('./users');
+const cronogramaRoutes = require("./cronogram")
+const users = require("./users")
 
-router.use('/users', users);
+//Roteadores utilizados
+router.use("/users", users)
+router.use("/cronogram", cronogramaRoutes)
 
-module.exports = router;
+module.exports = router
