@@ -1,60 +1,68 @@
-const Flashcard = require("../../models/Flashcard")
+const { Flashcard } = require('../../models');
 
-const createController = async (flashcardData) => {
+/**
+ * This function creates a flashcard
+ *
+ * @param {Object} req - The Express request object, containing the user's data in `req.body`.
+ * @param {Object} res - The Express response object, used to send the response.
+ *
+ *
+ * @returns response.status(code).json(body)
+ * code: 201
+ * body: {
+ * flashcard: flashcard <Flashcard>
+ * }
+ *
+ * code: 500
+ * body: {
+ *  error: "Erro ao criar cronograma. Erro interno do servidor"
+ * }
+ *
+ */
+
+const createController = async (req, res) => {
   try {
-    const { title, startDate, endDate, userId } = flashcardData // Disstructure the values of 'flashcardData'
-    const requiredFields = {
-      title,
-      startDate,
-      endDate,
-      userId,
-    } //Makes an object with the required fields
+    const flashcard_data = req.body;
 
-    const missingFields = Object.entries(requiredFields) //Converts the 'requiredFields' into a list of pairs [key, value]
-      .filter(([key, value]) => value === null || value === undefined || "") //Filters the null, undefined or empty string
-      .map(([key]) => key) // and make a map with them
-    if (missingFields.length > 0) {
-      //Verify if exists nonvalid fields
-      throw {
-        // sends an exception containing an error message
-        message: `Os seguintes campos estão ausentes ou inválidos: ${missingFields.join(
-          ", "
-        )}`,
-      }
-    }
+    const flashcard = await createService(flashcard_data);
 
-    const flashcard = await createService(flashcardData)
-    return flashcard
+    return res.status(201).json({ flashcard: flashcard });
   } catch (error) {
-    throw { message: error.message }
+    return res.status(500).json({
+      error: error.message
+    });
   }
-}
+};
 
-module.exports = { createController }
+module.exports = { createController };
 
 // Services
 
-async function createService(flashcardData) {
-  return Flashcard.create(flashcardData)
+async function createService(flashcard_data) {
+  return await Flashcard.create(flashcard_data);
 }
-async function FindByIdService(flashcardId) {
-  return Flashcard.findById(flashcardId)
+
+//TODO Implement the other services for future controllers to make
+/*
+async function FindByIdService(flashcard_id) {
+  return Flashcard.findById(flashcard_id);
 }
 
 async function FindAllService() {
-  return Flashcard.find()
+  return Flashcard.find();
 }
 
-async function FindByUserIdService(userId) {
-  return Flashcard.find({ userId })
+async function FindByUserIdService(user_id) {
+  return Flashcard.find({ userId: user_id });
 }
 
-async function UpdateService(flashcardId, flashcardData) {
-  return Flashcard.findByIdAndUpdate(flashcardId, flashcardData, {
-    new: true,
-  })
+async function UpdateService(flashcard_id, flashcard_data) {
+  return Flashcard.findByIdAndUpdate(flashcard_id, flashcard_data, {
+    new: true
+  });
 }
 
-async function DeleteService(flashcardId) {
-  return Flashcard.findByIdAndDelete(flashcardId)
+async function DeleteService(flashcard_id) {
+  return Flashcard.findByIdAndDelete(flashcard_id);
 }
+*/
