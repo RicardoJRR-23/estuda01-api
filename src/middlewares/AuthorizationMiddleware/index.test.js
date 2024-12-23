@@ -129,7 +129,7 @@ describe('AuthorizationMiddleware', () => {
       const expected_error_response = {
         status: 401,
         body: {
-          error: 'Token não é válido.'
+          error: 'Token inválido.'
         }
       };
 

@@ -62,7 +62,7 @@ module.exports = async (req, res, next) => {
 
     // Handles specific errors from `authenticationTokenUtil`.
     if (error instanceof authenticationTokenUtil.errors.InvalidTokenError) {
-      return returnUnauthorizedResponse(res, 'Token não é válido.'); // 401 for invalid token.
+      return returnUnauthorizedResponse(res, 'Token inválido.'); // 401 for invalid token.
     }
     else if (error instanceof authenticationTokenUtil.errors.ExpiredTokenError) {
       return returnUnauthorizedResponse(res, 'Token expirado.'); // 401 for expired token.
