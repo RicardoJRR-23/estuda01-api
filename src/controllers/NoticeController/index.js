@@ -24,7 +24,7 @@ const registerNotice = async (req, res) => {
 
     return res
       .status(201)
-      .json({ id: notice_created._id.toString() });
+      .json(notice_created);
   } catch (error) {
     console.error('Unexpected Error: ', error);
 
@@ -36,6 +36,72 @@ const registerNotice = async (req, res) => {
   }
 };
 
+/**
+ * Get a list of notices from an authenticated user
+ *
+ * @param {Object} req - The Express request object, containing the authenticated user payload
+ * @param {Object} res - The Express response object, used to send the response. 
+ *
+ * @returns {Promise<void>} Sends an HTTP response with the appropriate status code:
+ * - 200:  Notices successfuly returned
+ * - 500: Unexpected server error.
+ */
+const fetchNotices = async (req, res) => {
+  try {
+    const notices = await Notice.find({ userId: req.user.id });
+
+    return res
+      .status(200)
+      .json(notices || []);
+  } catch (error) {
+    console.error('Unexpected Error: ', error);
+
+    return res
+      .status(500)
+      .json({
+        error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+      });
+  }
+}
+
+/**
+ * Get a notice that matches a provided id and that should belong to the authenticated user
+ *
+ * @param {Object} req - The Express request object, containing the noticeId on the params attribute and also the authenticated user payload
+ * @param {Object} res - The Express response object, used to send the response.
+ *
+ * @returns {Promise<void>} Sends an HTTP response with the appropriate status code:
+ * - 200:  Notices successfuly returned
+ * - 500: Unexpected server error.
+ */
+const fetchNotice = async (req, res) => {
+  try {
+    const notice = await Notice.findById(req.params.noticeId);
+
+    if (!notice || notice?.userId.toString() !== req.user.id) {
+      return res
+        .status(404)
+        .json({
+          error: 'Edital não encontrado.'
+        });
+    }
+  
+    return res
+      .status(200)
+      .json(notice);
+  } catch (error) {
+    console.error('Unexpected Error: ', error);
+
+    return res
+      .status(500)
+      .json({
+        error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+      });
+  }
+}
+
 module.exports = {
+  fetchNotice,
+  fetchNotices,
   registerNotice,
 }

@@ -43,7 +43,7 @@ describe('POST /notices', () => {
   describe('Success cases', () => {
     it('Should be able to store a notice when the payload sent match the schema structure requirements', async () => {
       const notice_payload = {
-        datePublished: '2024-01-01',
+        datePublished: '2024-01-01T00:00:00.000Z',
         link: 'https://www.concursoeducacao2024.gov.br/edital',
         title: 'Edital do Concurso Público para Professor de Ensino Médio - 2024',
         description: 'Edital oficial para o concurso público de professores do ensino médio. Inclui requisitos de inscrição, cronograma de provas, conteúdo programático e normas gerais.',
@@ -55,20 +55,13 @@ describe('POST /notices', () => {
         .send(notice_payload)
         .expect(201);
 
-      const notice = await Notice.findOne();
-
       const expected_notice_payload = {
-        _id: mongoose.Types.ObjectId.createFromHexString(response.body.id),
-        userId: mongoose.Types.ObjectId.createFromHexString(user_id),
+        _id: expect.any(String),
+        userId: user_id,
         ...notice_payload
-      };
-      expected_notice_payload.datePublished =
-        new Date(expected_notice_payload.datePublished);   
+      }; 
 
-      expect(response.body).toMatchObject({
-        id: expect.any(String)
-      });
-      expect(notice).toMatchObject(expected_notice_payload);
+      expect(response.body).toMatchObject(expected_notice_payload);
     });
 
     it('Should be able to store a notice when the payload sent match does not contain the "datePublished" attribute.', async () => {
@@ -84,26 +77,21 @@ describe('POST /notices', () => {
         .send(notice_payload)
         .expect(201);
 
-      const notice = await Notice.findOne();
-
       const expected_notice_payload = {
-        _id: mongoose.Types.ObjectId.createFromHexString(response.body.id),
-        userId: mongoose.Types.ObjectId.createFromHexString(user_id),
+        _id: expect.any(String),
+        userId: user_id,
         ...notice_payload,
-        datePublished: expect.any(Date)
+        datePublished: expect.any(String)
       };
 
-      expect(response.body).toMatchObject({
-        id: expect.any(String)
-      });
-      expect(notice).toMatchObject(expected_notice_payload);
+      expect(response.body).toMatchObject(expected_notice_payload);
     });
   });
 
   describe('Error cases', () => {
     it('Should return status code 400 when the user does not provide the title', async () => {
       const notice_payload = {
-        datePublished: '2024-01-01',
+        datePublished: '2024-01-01T00:00:00.000Z',
         link: 'https://www.concursoeducacao2024.gov.br/edital',
         description: 'Edital oficial para o concurso público de professores do ensino médio. Inclui requisitos de inscrição, cronograma de provas, conteúdo programático e normas gerais.',
       };
@@ -121,7 +109,7 @@ describe('POST /notices', () => {
 
     it('Should return status code 400 when the user does not provide the description', async () => {
       const notice_payload = {
-        datePublished: '2024-01-01',
+        datePublished: '2024-01-01T00:00:00.000Z',
         link: 'https://www.concursoeducacao2024.gov.br/edital',
         title: 'Edital do Concurso Público para Professor de Ensino Médio - 2024'
       };
