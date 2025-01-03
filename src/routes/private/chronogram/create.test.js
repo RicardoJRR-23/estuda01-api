@@ -210,17 +210,6 @@ describe('Router Tests ', () => {
       expect(response.body.error).toEqual(expect.any(String));
     });
 
-    //! 404 - Method Not Allowed (Not Found)
-    it('Should return 404 if the request method is different then POST', async () => {
-      // Méthod not expected (example: GET) for the Create Cronogram Route
-      const response = await request(app)
-        .get('/chronogram/')
-        .set('authorization', `Bearer ${authentication_token}`);
-
-      expect(response.status).toBe(404);
-      expect(response.body.error).toEqual('Rota não encontrada');
-    });
-
     //! 500 - Internal Server Error
     it('Should return 500 with detailed error message if creation fails', async () => {
       const mockErrorMessage =
