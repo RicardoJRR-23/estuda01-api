@@ -72,6 +72,7 @@ const fetchNotices = async (req, res) => {
  *
  * @returns {Promise<void>} Sends an HTTP response with the appropriate status code:
  * - 200:  Notices successfuly returned
+ * - 404: When the notice is not found
  * - 500: Unexpected server error.
  */
 const fetchNotice = async (req, res) => {
@@ -100,8 +101,100 @@ const fetchNotice = async (req, res) => {
   }
 }
 
+/**
+ * Fully updates a notice that matches a provided id and that should belong to the authenticated user
+ *
+ * @param {Object} req - The Express request object, containing the noticeId on the params attribute, the body request payload containing the details and also the authenticated user payload
+ * @param {Object} res - The Express response object, used to send the response.
+ *
+ * @returns {Promise<void>} Sends an HTTP response with the appropriate status code:
+ * - 200:  Notices successfuly returned
+ * - 404: When the notice is not found
+ * - 500: Unexpected server error.
+ */
+const updateNotice = async (req, res) => {
+  try {
+    const id = req.params.noticeId;
+
+    let notice = await Notice.findById(id);
+
+    if (!notice || notice?.userId.toString() !== req.user.id) {
+      return res
+        .status(404)
+        .json({
+          error: 'Edital não encontrado.'
+        });
+    }
+
+    const payload = req.body;
+    payload.updatedAt = Date.now();
+
+    await Notice.updateOne({ _id: id }, payload);
+
+    return res
+      .status(204)
+      .send();
+
+  } catch (error) {
+    console.error('Unexpected Error: ', error);
+
+    return res
+      .status(500)
+      .json({
+        error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+      });
+  }
+}
+
+/**
+ * Partially updates a notice that matches a provided id and that should belong to the authenticated user
+ *
+ * @param {Object} req - The Express request object, containing the noticeId on the params attribute, the body request payload containing the details and also the authenticated user payload
+ * @param {Object} res - The Express response object, used to send the response.
+ *
+ * @returns {Promise<void>} Sends an HTTP response with the appropriate status code:
+ * - 200:  Notices successfuly returned
+ * - 404: When the notice is not found
+ * - 500: Unexpected server error.
+ */
+const patchNotice = async (req, res) => {
+  try {
+    const id = req.params.noticeId;
+
+    let notice = await Notice.findById(id);
+
+    if (!notice || notice?.userId.toString() !== req.user.id) {
+      return res
+        .status(404)
+        .json({
+          error: 'Edital não encontrado.'
+        });
+    }
+
+    const payload = req.body;
+    payload.updatedAt = Date.now();
+
+    await Notice.updateOne({ _id: id }, payload);
+
+    return res
+      .status(204)
+      .send();
+
+  } catch (error) {
+    console.error('Unexpected Error: ', error);
+
+    return res
+      .status(500)
+      .json({
+        error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+      });
+  }
+}
+
 module.exports = {
   fetchNotice,
+  patchNotice,
   fetchNotices,
+  updateNotice,
   registerNotice,
 }
