@@ -168,7 +168,7 @@ describe('GET /:userId ', () => {
 
       expect(response.status).toBe(401);
       expect(response.body).toMatchObject({
-        error: 'Token não é válido.'
+        error: 'Token inválido.'
       });
     });
 
