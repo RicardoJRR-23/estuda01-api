@@ -5,7 +5,7 @@ const {
 } = require('../../../controllers/ChronogramController');
 
 const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMiddleware');
-const chronogram_form_schema = require('./chronogram_form_schema');
+const chronogram_post_schema = require('./chronogram_post_schema');
 /**
  * @swagger
  * /chronogram:
@@ -107,6 +107,6 @@ const chronogram_form_schema = require('./chronogram_form_schema');
  *                   description: Internal server error message
  */
 
-router.post('/', ValidateSchemaMiddleware(chronogram_form_schema), createController);
+router.post('/', ValidateSchemaMiddleware(chronogram_post_schema), createController);
 
 module.exports = router;

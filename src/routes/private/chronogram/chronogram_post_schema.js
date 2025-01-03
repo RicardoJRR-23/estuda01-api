@@ -29,8 +29,7 @@ module.exports = Joi.object({
       name: Joi.string(),
       completed: Joi.boolean()
     })
-  ),
-  userId: Joi.string().required()
+  )
 })
   .required()
   .unknown(false)
