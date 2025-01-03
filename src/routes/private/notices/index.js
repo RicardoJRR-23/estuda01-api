@@ -244,7 +244,7 @@ router.get('/:noticeId', Controller.fetchNotice);
  *         schema:
  *           type: string
  *         description: >
- *           The ID of notice that the user wants to fetch
+ *           The ID of notice that the user wants to update
  *     requestBody:
  *       required: true
  *       content:
@@ -320,7 +320,7 @@ router.put('/:noticeId',
  *         schema:
  *           type: string
  *         description: >
- *           The ID of notice that the user wants to fetch
+ *           The ID of notice that the user wants to patch
  *     requestBody:
  *       required: true
  *       content:
@@ -373,5 +373,38 @@ router.patch('/:noticeId',
   ValidateSchemaMiddleware(patch_schema),
   Controller.patchNotice
 );
+
+/**
+ * @swagger
+ * /notices/{noticeId}:
+ *   delete:
+ *     summary: Delete an instance of a notice
+ *     description: This endpoint deletes a created instance of a notice. It validates if the provided id matches an existing one on the database else it returns 404
+ *     tags:
+ *       - Notices
+ *     parameters:
+ *       - in: path
+ *         name: noticeId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: >
+ *           The ID of the notice that the user wants to delete
+ *     responses:
+ *       '204':
+ *         description: Notice successfuly deleted
+ *       '404':
+ *         description: Couldn't find the respective notice
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Edital não encontrado."
+ * 
+ */
+router.delete('/:noticeId', Controller.deleteNotice);
 
 module.exports = router;
