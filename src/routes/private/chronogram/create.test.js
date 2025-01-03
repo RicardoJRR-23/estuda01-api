@@ -53,9 +53,9 @@ describe('Router Tests ', () => {
 
   //* Success Case
   describe('Success Cases', () => {
-    //* 201 - Created Cronogram
+    //* 201 - Created Chronogram
 
-    it('should return 201 if created a cronograma successfully', async () => {
+    it('Should return 201 if created a cronograma successfully', async () => {
       // Model Return Mock (see example in ficheiro 'src/models/Cronograma/index.js')
 
       // Correctly filled form payload
@@ -75,7 +75,7 @@ describe('Router Tests ', () => {
       const date_regex = /^\d{4}-\d{2}-\d{2}$/;
 
       const response = await request(app)
-        .post('/chronogram/') // Route to create cronograma being tested
+        .post('/chronogram/') // Route to create chronogram being tested
         .set('authorization', `Bearer ${authentication_token}`)
         .send(payload); // Sends the payload as a JSON Object
 
@@ -91,7 +91,7 @@ describe('Router Tests ', () => {
       expect(chronogram_object).toMatchObject({
         title: payload.title,
         description: payload.description,
-        startDate: new Date(payload.startDate), // Certifique-se de que é comparável com Date
+        startDate: new Date(payload.startDate),
         endDate: new Date(payload.endDate),
         tasks: expect.arrayContaining(
           payload.tasks.map(task =>
@@ -107,7 +107,7 @@ describe('Router Tests ', () => {
   //! Error Cases
   describe('Error Cases', () => {
     //! 400 - Missing or wrongly filled required fields or invalid fields (Bad Request)
-    it('should return 400 if the  the required "title" field  is send in a request with missing or wrongly filled, or type other then String', async () => {
+    it('Should return 400 if the  the required "title" field  is send in a request with missing or wrongly filled, or type other then String', async () => {
       // Invalid values ​​for fields title
       const invalid_answers = [
         undefined,
@@ -137,7 +137,7 @@ describe('Router Tests ', () => {
 
       expect(response.body.error).toEqual(expect.any(String));
     });
-    it('should return 400 if the the required "startDate" field  is send in a request with missing or wrongly filled, or invalid Date form', async () => {
+    it('Should return 400 if the the required "startDate" field  is send in a request with missing or wrongly filled, or invalid Date form', async () => {
       // Invalid values ​​for fields startDate
       const invalid_answers = [
         undefined,
@@ -173,7 +173,7 @@ describe('Router Tests ', () => {
       expect(response.body.error).toEqual(expect.any(String));
     });
 
-    it('should return 400 if the the required "endDate" field  is send in a request with missing or wrongly filled, or invalid Date form', async () => {
+    it('Should return 400 if the the required "endDate" field  is send in a request with missing or wrongly filled, or invalid Date form', async () => {
       // Invalid values ​​for fields startDate
       const invalid_answers = [
         undefined,
@@ -211,7 +211,7 @@ describe('Router Tests ', () => {
     });
 
     //! 404 - Method Not Allowed (Not Found)
-    it('should return 404 if the request method is different then POST', async () => {
+    it('Should return 404 if the request method is different then POST', async () => {
       // Méthod not expected (example: GET) for the Create Cronogram Route
       const response = await request(app)
         .get('/chronogram/')
@@ -222,7 +222,7 @@ describe('Router Tests ', () => {
     });
 
     //! 500 - Internal Server Error
-    it('should return 500 with detailed error message if creation fails', async () => {
+    it('Should return 500 with detailed error message if creation fails', async () => {
       const mockErrorMessage =
         'Erro ao criar cronograma. Erro interno do servidor';
       // Mockando o método `create` do modelo `Cronogram`

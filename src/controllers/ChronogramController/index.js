@@ -69,7 +69,7 @@ const createController = async (req, res) => {
  *
  *  code: 200
  *    body: {
- *      chronogram: chronogram <Chronogram>
+ *      chronogram <Object Chronogram>
  *    }
  *
  * (if something unexpected happpened while trying to find the chronogram)
@@ -96,6 +96,34 @@ const findByUserIdController = async (req, res) => {
     });
   }
 };
+
+/**
+ * 
+ * @function findByIdController
+ * @description
+ *  This function searches for a chronogram by its 'id'
+ * 
+ * @param {Object} req - The request object, containing the form data in `req.body`.
+ * @param {Object} res - The response object, used to send the response.
+ * 
+ * @returns response. status(code).json(body)
+ * 
+ * (if success in finding the cronogram)
+ * 
+ *  code: 200
+ *    body: {
+ *      chronogram <Object Chronogram>
+ *    }
+ * 
+ * (if something unexpected happpened while trying to find the chronogram)
+ * 
+ *  code: 500
+ *    body: {
+ *      error: 'Erro ao buscar cronograma. Erro interno do servidor'
+ *    }
+ *
+ }
+ */
 
 const findByIdController = async (req, res) => {
   try {
@@ -138,14 +166,14 @@ async function findByUserIdService(user_id) {
 async function findByUserIdAndIdService(user_id, chronogram_id) {
   return Chronogram.find({ _id: chronogram_id, userId: user_id });
 }
-
-//TODO Implement the other services for future controllers to make
-/*
 async function UpdateService(chronograma_id, chronogram_data) {
   return Chronogram.findByIdAndUpdate(chronograma_id, chronogram_data, {
     new: true
   });
 }
+
+//TODO Implement the other services for future controllers to make
+/*
 
 async function DeleteService(chronograma_id) {
   return Chronogram.findByIdAndDelete(chronograma_id);
