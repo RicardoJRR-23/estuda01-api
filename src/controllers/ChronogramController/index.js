@@ -59,7 +59,7 @@ const createController = async (req, res) => {
  * This function searches for a chronogram by its 'id',
  * find all chronograms or by 'userId'
  *
- * The base params for all the functions are:
+ *
  * @param {Object} req - The request object, containing the form data in `req.body`.
  * @param {Object} res - The response object, used to send the response.
  *
@@ -69,7 +69,7 @@ const createController = async (req, res) => {
  *
  *  code: 200
  *    body: {
- *      chronogram: chronogram <Chronogram>
+ *      chronogram <Object of Chronogram>
  *    }
  *
  * (if something unexpected happpened while trying to find the chronogram)
@@ -96,6 +96,40 @@ const findByUserIdController = async (req, res) => {
     });
   }
 };
+
+/**
+ *
+ * @function findByIdController
+ * @description
+ * This function searches for a chronogram by its 'id'
+ * 
+ * @param {Object} req - The request object, containing the form data in `req.body`.
+ * @param {Object} res - The response object, used to send the response.
+ * 
+ * @returns response. status(code).json(body)
+ * 
+ * (if success in finding the cronogram)
+ * 
+ *  code: 200
+ *    body: {
+ *      chronogram <Object of Chronogram>
+ *    }
+ *
+ * (If not finding the chronogram)
+ * 
+ *  code: 404
+ *    body: {
+ *      error: 'Cronograma não encontrado.'
+ *    }
+ *  
+ * (if something unexpected happpened while trying to find the chronogram)
+ * 
+ *  code: 500
+ *    body: {
+ *      error: 'Erro ao buscar cronograma. Erro interno do servidor'
+ *    }
+ *
+ */
 
 const findByIdController = async (req, res) => {
   try {

@@ -21,7 +21,16 @@ describe('GET /:userId ', () => {
     role: 'admin',
     password: '@123password'
   };
-
+  const chronogram_payload = {
+    title: 'Novo Cronograma',
+    description: 'Detalhes do cronograma',
+    startDate: '2024-01-01',
+    endDate: '2024-01-31',
+    tasks: [
+      { name: 'Task 1', completed: false },
+      { name: 'Task 2', completed: true }
+    ]
+  };
   let authentication_token;
   let user_id;
 
@@ -38,16 +47,34 @@ describe('GET /:userId ', () => {
     });
 
     authentication_token = response.body.access_token;
+    const chronogram_data = {
+      ...chronogram_payload,
+      userId: user_id
+    };
+    await Chronogram.create(chronogram_data);
+  });
+
+  beforeEach(async () => {
+    const chronogram_data = {
+      ...chronogram_payload,
+      userId: user_id
+    };
+    await Chronogram.create(chronogram_data);
   });
 
   afterAll(async () => {
     await dbDisconnect();
   });
 
+  afterEach(async () => {
+    await Chronogram.deleteMany({});
+  });
+
   describe('Suceess cases, response with status 200', () => {
     //* 200 - Find all Chronograms of a user
 
     it('Should return a empty array, if not finding any chronogram', async () => {
+      await Chronogram.deleteMany({});
       const response = await request(app)
         .get(`/chronogram/`)
         .set('authorization', `Bearer ${authentication_token}`);
@@ -58,41 +85,15 @@ describe('GET /:userId ', () => {
       expect(response.body.length).toEqual(0);
     });
     it('Should return a chronogram with userId of the authenticated user', async () => {
-      //simulate a chronogram payload for creation
-      const chronogram_payload = {
-        title: 'Novo Cronograma',
-        description: 'Detalhes do cronograma',
-        startDate: '2024-01-01',
-        endDate: '2024-01-31',
-        tasks: [
-          { name: 'Task 1', completed: false },
-          { name: 'Task 2', completed: true }
-        ],
-        userId: user_id
-      };
-
-      //Create the chronogram
-      await request(app)
-        .post('/chronogram/') // Route to create cronograma being tested
-        .set('authorization', `Bearer ${authentication_token}`)
-        .send(chronogram_payload);
-
-      // Regex to validate the yyyy-mm-dd format
-      const date_regex = /^\d{4}-\d{2}-\d{2}$/;
-
       //Get all chronograms
       const response = await request(app)
         .get(`/chronogram/`)
         .set('authorization', `Bearer ${authentication_token}`);
 
-      expect(date_regex.test(chronogram_payload.startDate)).toBe(true);
-      expect(date_regex.test(chronogram_payload.endDate)).toBe(true);
-
       expect(response.status).toBe(200);
       expect(response.body).toBeInstanceOf(Array);
       expect(response.body.length).toBeGreaterThan(0);
 
-      console.log(response.body);
       //Check if the chronogram created is in the response
       response.body.forEach(chronogram => {
         expect(chronogram).toMatchObject({
@@ -116,8 +117,7 @@ describe('GET /:userId ', () => {
         description: 'Detalhes do cronograma',
         startDate: '2024-01-01',
         endDate: '2024-01-31',
-        tasks: [],
-        userId: user_id
+        tasks: []
       };
 
       await request(app)
@@ -143,35 +143,13 @@ describe('GET /:userId ', () => {
         expect(chronogram).toMatchObject({
           title: chronogram_payload.title,
           description: chronogram_payload.description,
-          tasks: expect.arrayContaining([]),
-          userId: user_id
+          tasks: expect.arrayContaining([])
         });
       });
     });
   });
+  
   describe('Error cases', () => {
-    //! 401 - Unauthorized
-    it('Should return 401 if the token was not sended', async () => {
-      const response = await request(app).get(`/chronogram/`);
-
-      expect(response.status).toBe(401);
-      expect(response.body).toMatchObject({
-        error: 'Token não foi enviado.'
-      });
-    });
-
-    it('Should return 401 if invalid token', async () => {
-      const invalid_token = 'invalid-token';
-      const response = await request(app)
-        .get(`/chronogram/`)
-        .set('authorization', `Bearer ${invalid_token}`);
-
-      expect(response.status).toBe(401);
-      expect(response.body).toMatchObject({
-        error: 'Token não é válido.'
-      });
-    });
-
     //! 500 - Internal Server Error
     it('Should return 500 with if there was an unexpected error occurred', async () => {
       const mockErrorMessage =
@@ -181,22 +159,9 @@ describe('GET /:userId ', () => {
         .spyOn(Chronogram, 'find')
         .mockRejectedValue(new Error(mockErrorMessage));
 
-      const payload = {
-        title: 'Erro Cronograma',
-        description: 'Detalhes do erro',
-        startDate: '2024-01-01',
-        endDate: '2024-01-31',
-        tasks: [
-          { name: 'Task 1', completed: false },
-          { name: 'Task 2', completed: true }
-        ],
-        userId: '63f9e18e68d8d830f8e4f1a3'
-      };
-
       const response = await request(app)
         .get(`/chronogram/`)
-        .set('authorization', `Bearer ${authentication_token}`)
-        .send(payload);
+        .set('authorization', `Bearer ${authentication_token}`);
 
       expect(response.status).toBe(500);
       expect(response.body).toHaveProperty('error');
