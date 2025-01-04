@@ -172,14 +172,14 @@ async function findByUserIdService(user_id) {
 async function findByUserIdAndIdService(user_id, chronogram_id) {
   return Chronogram.find({ _id: chronogram_id, userId: user_id });
 }
-
-//TODO Implement the other services for future controllers to make
-/*
 async function UpdateService(chronograma_id, chronogram_data) {
   return Chronogram.findByIdAndUpdate(chronograma_id, chronogram_data, {
     new: true
   });
 }
+
+//TODO Implement the other services for future controllers to make
+/*
 
 async function DeleteService(chronograma_id) {
   return Chronogram.findByIdAndDelete(chronograma_id);
