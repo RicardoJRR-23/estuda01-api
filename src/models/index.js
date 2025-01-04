@@ -4,4 +4,3 @@ const Chronogram = require('./Chronogram');
 module.exports = {
   User,
   Chronogram
-};
