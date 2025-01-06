@@ -38,8 +38,8 @@ const createController = async (req, res) => {
   try {
     // Gets the chronogram data from the request body, which was validated by the middleware
     // see src/routes/private/chronogram/chronogram_form_schema.js
-    const chronogram_data = req.body;
-
+    const chronogram_data = {...req.body, userId: req.user.id};
+    console.info('Starting to create chronogram...');
     // Creates chronogram
     const chronogram = await createService(chronogram_data);
 

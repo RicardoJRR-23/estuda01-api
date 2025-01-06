@@ -11,7 +11,7 @@ module.exports = Joi.object({
     'string.base': 'Campo "title" deve ser do tipo String.',
     'any.required': 'Campo "title" está em falta.'
   }),
-  description: Joi.string(),
+  description: Joi.string().optional(),
   startDate: Joi.date().iso().required().messages({
     'date.base':
       'Campo "startDate" deve ser uma data válida, exemplo: (1999-12-31)',
