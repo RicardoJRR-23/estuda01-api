@@ -4,12 +4,15 @@ const router = express.Router();
 const chronogram_routes = require('./chronogram');
 const users = require('./users');
 const notices = require('./notices');
+const study_modules = require('./studyModules');
 
-//Roteadores utilizados
+// Private routes
 router.use('/users', users);
+
 router.use('/chronogram', chronogram_routes);
+
 router.use('/notices', notices);
 
+router.use('/studyModules', study_modules);
+
 module.exports = router;
-
-
