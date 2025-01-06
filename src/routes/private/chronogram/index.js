@@ -3,11 +3,11 @@ const router = express.Router();
 const {
   createController,
   findByUserIdController,
-  findByIdController,
+  findByIdController
 } = require('../../../controllers/ChronogramController');
 
 const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMiddleware');
-const chronogram_form_schema = require('./chronogram_form_schema');
+const chronogram_post_schema = require('./chronogram_post_schema');
 /**
  * @swagger
  * /chronogram/:
@@ -111,7 +111,7 @@ const chronogram_form_schema = require('./chronogram_form_schema');
 
 router.post(
   '/',
-  ValidateSchemaMiddleware(chronogram_form_schema),
+  ValidateSchemaMiddleware(chronogram_post_schema),
   createController
 );
 
@@ -159,6 +159,18 @@ router.post(
  *                               type: boolean
  *                       userId:
  *                         type: string
+ *       401:
+ *         description: Unauthorized access to user information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Unauthorized access to user information
+ *                   example:
+ *                    'Token não foi enviado.'
  *
  *       500:
  *         description: Internal server error
@@ -233,6 +245,19 @@ router.get('/', findByUserIdController);
  *                       type: string
  *                       example:
  *                         '123456789012345678901234'
+ *
+ *       401:
+ *         description: Unauthorized access to user information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Unauthorized access to user information
+ *                   example:
+ *                    'Token não foi enviado.'
  *
  *       404:
  *         description: Chronogram not found
