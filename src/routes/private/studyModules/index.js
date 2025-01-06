@@ -120,4 +120,166 @@ router.post('/',
   Controller.registerStudyModule
 );
 
+/**
+ * @swagger
+ * /studyModules:
+ *   get:
+ *     summary: get a list of study modules
+ *     description: This endpoint returns a list of study modules that belongs to the authenticated user.
+ *     tags:
+ *       - studyModules
+ *     responses:
+ *       '200':
+ *         description: study modules successfuly returned
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     description: The id of the created study module instance
+ *                     example: '6769973ec32d498d4402e3b0'
+ *                   title:
+ *                     type: string
+ *                     description: The title of the study module.
+ *                     example: "Matemática"
+ *                   description:
+ *                     type: string
+ *                     description: A description of the study module.
+ *                     example:  "Ramo rigoroso do conhecimento fundamental e estrutural para maioria das ciências"
+ *                   topics:
+ *                     type: array
+ *                     description: The list of topics covered in the study module
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         _id:
+ *                          type: string
+ *                          description: The id of the the topic item
+ *                          example: '8969973ec32d498d4402eb04'
+ *                         name:
+ *                           type: string
+ *                           description: The name of the study module topic
+ *                           example: 'Álgebra'
+ *                         content:
+ *                           type: string
+ *                           description: The content of the study module topic
+ *                           example: 'Polinômios, equações, inequações e funções'
+ *                   userId:
+ *                     type: string
+ *                     description: The id of the user who is authenticated and created the study module
+ *                     example: '7869973ec32d498d4402ec01'
+ *                   createdAt:
+ *                     type: string
+ *                     description: The time and date on which the study module was created
+ *                     example: '2024-12-23T23:31:00.437+00:00'
+ *                   updatedAt:
+ *                     type: string
+ *                     description: The last time the study module was updated
+ *                     example: '2024-12-23T23:31:00.437+00:00'
+ *       '500':
+ *         description: Unexpected error occur.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Ocorreu um erro inesperado. Tente novamente mais tarde."
+ */
+router.get('/', Controller.fetchStudyModules);
+
+/**
+ * @swagger
+ * /studyModules/{studyModuleId}:
+ *   get:
+ *     summary: get an instance of a study module
+ *     description: This endpoint returns an study module that belongs to the authenticated user.
+ *     tags:
+ *       - studyModules
+ *     parameters:
+ *       - in: path
+ *         name: studyModuleId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: >
+ *           The ID of the study module that the user wants to fetch
+ *     responses:
+ *       '200':
+ *         description: study module successfuly returned
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   description: The id of the created study module instance
+ *                   example: '6769973ec32d498d4402e3b0'
+ *                 title:
+ *                   type: string
+ *                   description: The title of the study module.
+ *                   example: "Matemática"
+ *                 description:
+ *                   type: string
+ *                   description: A description of the study module.
+ *                   example:  "Ramo rigoroso do conhecimento fundamental e estrutural para maioria das ciências"
+ *                 topics:
+ *                   type: array
+ *                   description: The list of topics covered in the study module
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         description: The id of the the topic item
+ *                         example: '8969973ec32d498d4402eb04'
+ *                       name:
+ *                         type: string
+ *                         description: The name of the study module topic
+ *                         example: 'Álgebra'
+ *                       content:
+ *                         type: string
+ *                         description: The content of the study module topic
+ *                         example: 'Polinômios, equações, inequações e funções'
+ *                 userId:
+ *                   type: string
+ *                   description: The id of the user who is authenticated and created the study module
+ *                   example: '7869973ec32d498d4402ec01'
+ *                 createdAt:
+ *                   type: string
+ *                   description: The time and date on which the study module was created
+ *                   example: '2024-12-23T23:31:00.437+00:00'
+ *                 updatedAt:
+ *                   type: string
+ *                   description: The last time the study module was updated
+ *                   example: '2024-12-23T23:31:00.437+00:00'
+ *       '404':
+ *         description: Couldn't find the respective study module
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Módulo de Estudo não encontrado."
+ *       '500':
+ *         description: Unexpected error occur.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Ocorreu um erro inesperado. Tente novamente mais tarde."
+ */
+router.get('/:studyModuleId', Controller.fetchStudyModule);
+
 module.exports = router;
