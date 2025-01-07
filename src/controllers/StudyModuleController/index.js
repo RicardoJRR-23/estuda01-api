@@ -190,10 +190,53 @@ const patchStudyModule = async (req, res) => {
   }
 };
 
+/**
+ * Deletes a study module that matches a provided id and that should belong to the authenticated user
+ *
+ * @param {Object} req - The Express request object, containing the studyModuleId on the params attribute and also the authenticated user payload
+ * @param {Object} res - The Express response object, used to send the response.
+ *
+ * @returns {Promise<void>} Sends an HTTP response with the appropriate status code:
+ * - 204: Study module successfuly deleted
+ * - 404: When the Study module is not found
+ * - 500: Unexpected server error.
+ */
+const deleteStudyModule = async (req, res) => {
+  try {
+    const id = req.params.studyModuleId;
+
+    let study_module = await StudyModule.findById(id);
+
+    if (!study_module || study_module?.userId.toString() !== req.user.id) {
+      return res
+        .status(404)
+        .json({
+          error: 'Módulo de Estudo não encontrado.'
+        });
+    }
+
+    await StudyModule.deleteOne({ _id: id });
+
+    return res
+      .status(204)
+      .send();
+
+  } catch (error) {
+    console.error('Unexpected Error: ', error);
+
+    return res
+      .status(500)
+      .json({
+        error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+      });
+  }
+}
+
 module.exports = {
   fetchStudyModule,
   patchStudyModule,
   fetchStudyModules,
   updateStudyModule,
+  deleteStudyModule,
   registerStudyModule,
 }
