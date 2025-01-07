@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const create_schema = require('./create_schema');
+const put_schema = require('./put_schema');
+const patch_schema = require('./patch_schema');
 const Controller = require('../../../controllers/StudyModuleController');
 const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMiddleware');
 
@@ -281,5 +283,157 @@ router.get('/', Controller.fetchStudyModules);
  *                   example: "Ocorreu um erro inesperado. Tente novamente mais tarde."
  */
 router.get('/:studyModuleId', Controller.fetchStudyModule);
+
+/**
+ * @swagger
+ * /studyModules/{studyModuleId}:
+ *   put:
+ *     summary: Fully updates a study module
+ *     description: This endpoint updates an instance of a study module with the provided details. It validates the request payload according to the defined schema.
+ *     tags:
+ *       - studyModules
+ *     parameters:
+ *       - in: path
+ *         name: studyModuleId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: >
+ *           The ID of the study module that the user wants to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - description
+ *               - topics
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: The title of the study module.
+ *               description:
+ *                 type: string
+ *                 description: A description of the study module.
+ *               topics:
+ *                 type: array
+ *                 description: The list of topics covered in the study module
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       description: The name of the study module topic
+ *                     content:
+ *                       type: string
+ *                       description: The content of the study module topic
+ *             example:
+ *               title: "Algoritmos e estrutura de dados"
+ *               description: "Disciplina abordada em ciência de computação que ensina a teoria e a pratica de Algoritmos e estrutura de dados"
+ *               topics: 
+ *                 - name: 'Algoritmos'
+ *                   content: 'Selection-Search, Binary-Search e Quicksort'
+ *     responses:
+ *       '204':
+ *         description: Sudy module updated successfully.
+ *       '404':
+ *         description: Couldn't find the respective study module
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Módulo de Estudo não encontrado."
+ *       '400':
+ *         description: Validation error due to invalid payload.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Campo \"title\" está em falta."
+ */
+router.put('/:studyModuleId',
+  ValidateSchemaMiddleware(put_schema),
+  Controller.updateStudyModule
+);
+
+/**
+ * @swagger
+ * /studyModules/{studyModuleId}:
+ *   patch:
+ *     summary: Partially updates a study module
+ *     description: This endpoint patches an instance of a study module with the provided details. It validates the request payload according to the defined schema.
+ *     tags:
+ *       - studyModules
+ *     parameters:
+ *       - in: path
+ *         name: studyModuleId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: >
+ *           The ID of the study module that the user wants to patch
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: The title of the study module.
+ *               description:
+ *                 type: string
+ *                 description: A description of the study module.
+ *               topics:
+ *                 type: array
+ *                 description: The list of topics covered in the study module
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       description: The name of the study module topic
+ *                     content:
+ *                       type: string
+ *                       description: The content of the study module topic
+ *             example:
+ *               description: "Ramo rigoroso do conhecimento"
+ *     responses:
+ *       '204':
+ *         description: Sudy module patched successfully.
+ *       '404':
+ *         description: Couldn't find the respective study module
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Módulo de Estudo não encontrado."
+ *       '400':
+ *         description: Validation error due to invalid payload.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: 'Pelo menos um dos campos "title", "description" ou "topics" deve ser providenciado.'
+ */
+router.patch('/:studyModuleId',
+  ValidateSchemaMiddleware(patch_schema),
+  Controller.patchStudyModule
+);
 
 module.exports = router;

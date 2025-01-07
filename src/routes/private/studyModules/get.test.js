@@ -65,11 +65,11 @@ describe('Fetch StudyModules', () => {
     };
 
     const study_module2 = {
-      title: 'Algoritimos e estrutura de dados',
-      description: 'Disciplina abordada em ciência de computação que ensina a teoria e a pratica de algoritimos e estrutura de dados',
+      title: 'Algoritmos e estrutura de dados',
+      description: 'Disciplina abordada em ciência de computação que ensina a teoria e a pratica de Algoritmos e estrutura de dados',
       topics: [
         {
-          name: 'Algoritimos',
+          name: 'Algoritmos',
           content: 'Selection-Search, Binary-Search e Quicksort'
         }
       ]

@@ -100,10 +100,100 @@ const fetchStudyModule = async (req, res) => {
         error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
       });
   }
-}
+};
+
+/**
+ * Fully updates a study module that matches a provided id and that should belong to the authenticated user
+ *
+ * @param {Object} req - The Express request object, containing the studyModuleId on the params attribute, the body request payload containing the details and also the authenticated user payload
+ * @param {Object} res - The Express response object, used to send the response.
+ *
+ * @returns {Promise<void>} Sends an HTTP response with the appropriate status code:
+ * - 204: Study module successfuly updated
+ * - 404: When the study module is not found
+ * - 500: Unexpected server error.
+ */
+const updateStudyModule = async (req, res) => {
+  try {
+    const id = req.params.studyModuleId;
+
+    let study_module = await StudyModule.findById(id);
+
+    if (!study_module || study_module?.userId.toString() !== req.user.id) {
+      return res
+        .status(404)
+        .json({
+          error: 'Módulo de Estudo não encontrado.'
+        });
+    }
+
+    const payload = req.body;
+    payload.updatedAt = Date.now();
+
+    await StudyModule.updateOne({ _id: id }, payload);
+
+    return res
+      .status(204)
+      .send();
+  } catch (error) {
+    console.error('Unexpected Error: ', error);
+
+    return res
+      .status(500)
+      .json({
+        error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+      });
+  }
+};
+
+/**
+ * Partially updates a study module that matches a provided id and that should belong to the authenticated user
+ *
+ * @param {Object} req - The Express request object, containing the studyModuleId on the params attribute, the body request payload containing the details and also the authenticated user payload
+ * @param {Object} res - The Express response object, used to send the response.
+ *
+ * @returns {Promise<void>} Sends an HTTP response with the appropriate status code:
+ * - 204: Study module successfuly patched
+ * - 404: When the study module is not found
+ * - 500: Unexpected server error.
+ */
+const patchStudyModule = async (req, res) => {
+  try {
+    const id = req.params.studyModuleId;
+
+    let study_module = await StudyModule.findById(id);
+
+    if (!study_module || study_module?.userId.toString() !== req.user.id) {
+      return res
+        .status(404)
+        .json({
+          error: 'Módulo de Estudo não encontrado.'
+        });
+    }
+
+    const payload = req.body;
+    payload.updatedAt = Date.now();
+
+    await StudyModule.updateOne({ _id: id }, payload);
+
+    return res
+      .status(204)
+      .send();
+  } catch (error) {
+    console.error('Unexpected Error: ', error);
+
+    return res
+      .status(500)
+      .json({
+        error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+      });
+  }
+};
 
 module.exports = {
   fetchStudyModule,
+  patchStudyModule,
   fetchStudyModules,
+  updateStudyModule,
   registerStudyModule,
 }
