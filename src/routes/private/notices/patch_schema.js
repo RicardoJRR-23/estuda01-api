@@ -29,7 +29,7 @@ module.exports = Joi.object({
 .required()
 .or('title', 'description', 'datePublished', 'link')
 .messages({
-  'object.missing': 'Pelo menos um dos campos "title", "description", "datePublished" or "link" tem de ser providenciado.'
+  'object.missing': 'Pelo menos um dos campos "title", "description", "datePublished" ou "link" deve ser providenciado.'
 })
 .unknown(false)
 .error((errors) => {
