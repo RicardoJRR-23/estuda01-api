@@ -18,7 +18,8 @@ describe('DELETE /notices/:noticeId', () => {
     const user_payload = {
       name: 'Paulo Guilherme',
       email: 'paulo.guilherme@gmail.com',
-      password: '@1234abc'
+      password: '@1234abc',
+      role: 'admin'
     };
 
     const user_created = await request(app)
@@ -56,81 +57,76 @@ describe('DELETE /notices/:noticeId', () => {
     await dbDisconnect();
   });
 
-  describe('Success cases', () => {
-    it('Should return status code 204 if the notice is successfully deleted', async () => {
-      await request(app)
-        .get(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .expect(200);
+  describe('Admin Users', () => {
+    describe('Success cases', () => {
+      it('Should return status code 204 if the notice is successfully deleted', async () => {
+        await request(app)
+          .get(`/notices/${notice_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .expect(200);
 
-      await request(app)
-        .delete(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .expect(204);
+        await request(app)
+          .delete(`/notices/${notice_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .expect(204);
 
-      await request(app)
-        .get(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .expect(404);
+        await request(app)
+          .get(`/notices/${notice_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .expect(404);
+      });
+    });
+
+    describe('Error cases', () => {
+      it('Should return 404 if the id provided does not belong to an existing notice', async () => {
+        const response = await request(app)
+          .delete(`/notices/${new mongoose.Types.ObjectId()}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .expect(404);
+        
+        expect(response.body).toMatchObject({
+          error: 'Edital não encontrado.'
+        });
+      });
     });
   });
 
-  describe('Error cases', () => {
-    it('Should return 404 if the id provided does not belong to an existing notice', async () => {
-      const response = await request(app)
-        .delete(`/notices/${new mongoose.Types.ObjectId()}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .expect(404);
-      
-      expect(response.body).toMatchObject({
-        error: 'Edital não encontrado.'
+  describe('Student Users', () => {
+    describe('Error cases', () => {
+      it('Should not be allowed to delete a notice', async () => {
+        const user_payload = {
+          name: 'Ricardo Lopez',
+          email: 'ricardo.lopez@gmail.com',
+          password: '@1234abc',
+          role: 'student'
+        };
+  
+        const user_created = await request(app)
+          .post('/users')
+          .send(user_payload)
+          .expect(201);
+  
+        const session = await request(app)
+          .post('/sessions')
+          .send({
+            email: user_payload.email,
+            password: user_payload.password
+          })
+          .expect(201);
+  
+        const access_token = session.body.access_token;
+
+        const response = await request(app)
+          .delete(`/notices/${notice_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .expect(403);
+  
+        const expected_notice_payload = {
+          error: 'Não tem permissão para aceder a essa rota.'
+        }; 
+  
+        expect(response.body).toMatchObject(expected_notice_payload);
       });
-    });
-
-    it('Should return 404 if the provided id does belong to an existing notice, but the notice does not belong to the authenticated user', async () => {
-      const user_payload = {
-        name: 'Ricardo Lopes',
-        email: 'ricardo.lopes@gmail.com',
-        password: '@1234abc'
-      };
-  
-      const user_created = await request(app)
-        .post('/users')
-        .send(user_payload)
-        .expect(201);
-      user_id = user_created.body.id;
-  
-      const session = await request(app)
-        .post('/sessions')
-        .send({
-          email: user_payload.email,
-          password: user_payload.password
-        })
-        .expect(201);
-  
-      const new_user_access_token = session.body.access_token;
-  
-      const { body: { _id: notice_id } } = await request(app)
-        .post('/notices')
-        .set('authorization', `Bearer ${new_user_access_token}`)
-        .send(notice_payload_created)
-        .expect(201);
-
-      await request(app)
-        .get(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${new_user_access_token}`)
-        .expect(200);
-
-      const old_user_access_token = access_token;
-
-      const response = await request(app)
-        .delete(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${old_user_access_token}`)
-        .expect(404);
-
-      expect(response.body).toMatchObject({
-        error: 'Edital não encontrado.'
-      });
-    });
+    })
   });
 });
