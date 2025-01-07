@@ -18,7 +18,8 @@ describe('PATCH /notices/:noticeId', () => {
     const user_payload = {
       name: 'Paulo Guilherme',
       email: 'paulo.guilherme@gmail.com',
-      password: '@1234abc'
+      password: '@1234abc',
+      role: 'admin'
     };
 
     const user_created = await request(app)
@@ -58,224 +59,218 @@ describe('PATCH /notices/:noticeId', () => {
     await dbDisconnect();
   });
 
-  describe('Success cases', () => {
-    it('Should be able to update the entire notice instance', async () => {
-      const payload = {
-        datePublished: '2024-01-01T00:00:00.000Z',
-        link: 'https://www.concursoeducacao2025.gov.br/edital',
-        title: 'Edital do Concurso Público para Professor de Ensino Médio - 2025',
-        description: 'Edital oficial para o concurso público de professores do ensino médio.',
-      };
-      
-      await request(app)
-        .patch(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .send(payload)
-        .expect(204);
+  describe('Admin Users', () => {
+    describe('Success cases', () => {
+      it('Should be able to update the entire notice instance', async () => {
+        const payload = {
+          datePublished: '2024-01-01T00:00:00.000Z',
+          link: 'https://www.concursoeducacao2025.gov.br/edital',
+          title: 'Edital do Concurso Público para Professor de Ensino Médio - 2025',
+          description: 'Edital oficial para o concurso público de professores do ensino médio.',
+        };
+        
+        await request(app)
+          .patch(`/notices/${notice_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .send(payload)
+          .expect(204);
 
-      const notice = await Notice.findById(notice_id);
+        const notice = await Notice.findById(notice_id);
 
-      const common_expected_attributes = {
-        _id: mongoose.Types.ObjectId.createFromHexString(notice_id),
-        datePublished: new Date(payload.datePublished),
-        createdAt: expect.any(Date),
-        updatedAt: expect.any(Date)
-      };
+        const common_expected_attributes = {
+          _id: mongoose.Types.ObjectId.createFromHexString(notice_id),
+          datePublished: new Date(payload.datePublished),
+          createdAt: expect.any(Date),
+          updatedAt: expect.any(Date)
+        };
 
-      const not_expected_payload = {
-        ...notice_payload_created,
-        ...common_expected_attributes
-      };
+        const not_expected_payload = {
+          ...notice_payload_created,
+          ...common_expected_attributes
+        };
 
-      const expected_payload = {
-        ...payload,
-        ...common_expected_attributes
-      }
+        const expected_payload = {
+          ...payload,
+          ...common_expected_attributes
+        }
 
-      expect(notice).not.toMatchObject(not_expected_payload);
-      expect(notice).toMatchObject(expected_payload);
+        expect(notice).not.toMatchObject(not_expected_payload);
+        expect(notice).toMatchObject(expected_payload);
+      });
+
+      it('Should be able to update partially the notice instance', async () => {
+        const payload = {
+          title: 'Edital do Concurso Público para Professor de Ensino Médio - 2025',
+          description: 'Edital oficial para o concurso público de professores do ensino médio.'
+        };
+        
+        await request(app)
+          .patch(`/notices/${notice_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .send(payload)
+          .expect(204);
+
+        const notice = await Notice.findById(notice_id);
+
+        const not_expected_payload = {
+          ...notice_payload_created,
+          _id: mongoose.Types.ObjectId.createFromHexString(notice_id),
+          datePublished: new Date(notice_payload_created.datePublished),
+          createdAt: expect.any(Date),
+          updatedAt: expect.any(Date)
+        };
+
+        const expected_payload = {
+          ...not_expected_payload,
+          ...payload,
+        }
+
+        expect(notice).not.toMatchObject(not_expected_payload);
+        expect(notice).toMatchObject(expected_payload);
+      });
     });
 
-    it('Should be able to update partially the notice instance', async () => {
-      const payload = {
-        title: 'Edital do Concurso Público para Professor de Ensino Médio - 2025',
-        description: 'Edital oficial para o concurso público de professores do ensino médio.'
-      };
-      
-      await request(app)
-        .patch(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .send(payload)
-        .expect(204);
+    describe('Error cases', () => {
+      it('Should return status code 400 when the user does not provide at least one of the attributes', async () => {
+        const notice_payload = {};
 
-      const notice = await Notice.findById(notice_id);
+        const response = await request(app)
+          .patch(`/notices/${notice_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .send(notice_payload)
+          .expect(400);
 
-      const not_expected_payload = {
-        ...notice_payload_created,
-        _id: mongoose.Types.ObjectId.createFromHexString(notice_id),
-        datePublished: new Date(notice_payload_created.datePublished),
-        createdAt: expect.any(Date),
-        updatedAt: expect.any(Date)
-      };
+        expect(response.body).toMatchObject({
+          error: 'Pelo menos um dos campos "title", "description", "datePublished" ou "link" deve ser providenciado.'
+        });
+      });
 
-      const expected_payload = {
-        ...not_expected_payload,
-        ...payload,
-      }
+      it('Should return status code 400 when the title is not a string', async () => {
+        const notice_payload = {
+          title: 455
+        };
 
-      expect(notice).not.toMatchObject(not_expected_payload);
-      expect(notice).toMatchObject(expected_payload);
+        const response = await request(app)
+          .patch(`/notices/${notice_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .send(notice_payload)
+          .expect(400);
+
+        expect(response.body).toMatchObject({
+          error: 'Campo "title" deve ser do tipo String.'
+        });
+      });
+
+      it('Should return status code 400 when the description is not a string', async () => {
+        const notice_payload = {
+          description: 445
+        };
+
+        const response = await request(app)
+          .patch(`/notices/${notice_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .send(notice_payload)
+          .expect(400);
+
+        expect(response.body).toMatchObject({
+          error: 'Campo "description" deve ser do tipo String.'
+        });
+      });
+
+      it('Should return status code 400 when the datePublished is not a valid format', async () => {
+        const notice_payload = {
+          datePublished: 'sadsds'
+        };
+
+        const response = await request(app)
+          .patch(`/notices/${notice_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .send(notice_payload)
+          .expect(400);
+
+        expect(response.body).toMatchObject({
+          error: 'O valor do campo "datePublished" deve estar no formato AAA-MM-DD'
+        });
+      });
+
+      it('Should return status code 400 when the link is not a valid format', async () => {
+        const notice_payload = {
+          link: 'concursoeducacao2024l'
+        };
+
+        const response = await request(app)
+          .patch(`/notices/${notice_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .send(notice_payload)
+          .expect(400);
+
+        expect(response.body).toMatchObject({
+          error: 'Campo "link" deve ser um link válido.'
+        });
+      });
+
+      it('Should return 404 if the id provided does not belong to an existing notice', async () => {
+        const notice_payload = {
+          title: 'Edital do Concurso Público para Professor de Ensino Médio - 2024'
+        };
+
+        const response = await request(app)
+          .patch(`/notices/${new mongoose.Types.ObjectId()}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .send(notice_payload)
+          .expect(404);
+
+        expect(response.body).toMatchObject({
+          error: 'Edital não encontrado.'
+        });
+      });
     });
   });
 
-  describe('Error cases', () => {
-    it('Should return status code 400 when the user does not provide at least one of the attributes', async () => {
-      const notice_payload = {};
-
-      const response = await request(app)
-        .patch(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .send(notice_payload)
-        .expect(400);
-
-      expect(response.body).toMatchObject({
-        error: 'Pelo menos um dos campos "title", "description", "datePublished" ou "link" deve ser providenciado.'
-      });
-    });
-
-    it('Should return status code 400 when the title is not a string', async () => {
-      const notice_payload = {
-        title: 455
-      };
-
-      const response = await request(app)
-        .patch(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .send(notice_payload)
-        .expect(400);
-
-      expect(response.body).toMatchObject({
-        error: 'Campo "title" deve ser do tipo String.'
-      });
-    });
-
-    it('Should return status code 400 when the description is not a string', async () => {
-      const notice_payload = {
-        description: 445
-      };
-
-      const response = await request(app)
-        .patch(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .send(notice_payload)
-        .expect(400);
-
-      expect(response.body).toMatchObject({
-        error: 'Campo "description" deve ser do tipo String.'
-      });
-    });
-
-    it('Should return status code 400 when the datePublished is not a valid format', async () => {
-      const notice_payload = {
-        datePublished: 'sadsds'
-      };
-
-      const response = await request(app)
-        .patch(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .send(notice_payload)
-        .expect(400);
-
-      expect(response.body).toMatchObject({
-        error: 'O valor do campo "datePublished" deve estar no formato AAA-MM-DD'
-      });
-    });
-
-    it('Should return status code 400 when the link is not a valid format', async () => {
-      const notice_payload = {
-        link: 'concursoeducacao2024l'
-      };
-
-      const response = await request(app)
-        .patch(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .send(notice_payload)
-        .expect(400);
-
-      expect(response.body).toMatchObject({
-        error: 'Campo "link" deve ser um link válido.'
-      });
-    });
-
-    it('Should return 404 if the id provided does not belong to an existing notice', async () => {
-      const notice_payload = {
-        title: 'Edital do Concurso Público para Professor de Ensino Médio - 2024'
-      };
-
-      const response = await request(app)
-        .patch(`/notices/${new mongoose.Types.ObjectId()}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .send(notice_payload)
-        .expect(404);
-
-      expect(response.body).toMatchObject({
-        error: 'Edital não encontrado.'
-      });
-    });
-
-    it('Should return 404 if the provided id does belong to an existing notice, but the notice does not belong to the authenticated user', async () => {
-      const user_payload = {
-        name: 'Ricardo Lopes',
-        email: 'ricardo.lopes@gmail.com',
-        password: '@1234abc'
-      };
+  describe('Student Users', () => {
+    describe('Error cases', () => {
+      it('Should not be allowed to patch a notice', async () => {
+        const user_payload = {
+          name: 'Ricardo Lopez',
+          email: 'ricardo.lopez@gmail.com',
+          password: '@1234abc',
+          role: 'student'
+        };
   
-      const user_created = await request(app)
-        .post('/users')
-        .send(user_payload)
-        .expect(201);
-      user_id = user_created.body.id;
+        const user_created = await request(app)
+          .post('/users')
+          .send(user_payload)
+          .expect(201);
   
-      const session = await request(app)
-        .post('/sessions')
-        .send({
-          email: user_payload.email,
-          password: user_payload.password
-        })
-        .expect(201);
+        const session = await request(app)
+          .post('/sessions')
+          .send({
+            email: user_payload.email,
+            password: user_payload.password
+          })
+          .expect(201);
   
-      const new_user_access_token = session.body.access_token;
-      
-      const notice_payload = {
-        datePublished: '2024-01-01T00:00:00.000Z',
-        link: 'https://www.concursoeducacao2024.gov.br/edital',
-        title: 'Edital do Concurso Público para Professor de Ensino Médio - 2024',
-        description: 'Edital oficial para o concurso público de professores do ensino médio. Inclui requisitos de inscrição, cronograma de provas, conteúdo programático e normas gerais.',
-      };
+        const access_token = session.body.access_token;
+
+        const notice_payload = {
+          datePublished: '2024-01-01T00:00:00.000Z',
+          link: 'https://www.concursoeducacao2024.gov.br/edital',
+          title: 'Edital do Concurso Público para Professor de Ensino Médio - 2024',
+          description: 'Edital oficial para o concurso público de professores do ensino médio. Inclui requisitos de inscrição, cronograma de provas, conteúdo programático e normas gerais.',
+        };
   
-      const { body: { _id: notice_id } } = await request(app)
-        .post('/notices')
-        .set('authorization', `Bearer ${new_user_access_token}`)
-        .send(notice_payload_created)
-        .expect(201);
-
-      await request(app)
-        .patch(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${new_user_access_token}`)
-        .send(notice_payload)
-        .expect(204);
-
-      const old_user_access_token = access_token;
-
-      const response = await request(app)
-        .patch(`/notices/${notice_id}`)
-        .set('authorization', `Bearer ${old_user_access_token}`)
-        .send(notice_payload)
-        .expect(404);
-
-      expect(response.body).toMatchObject({
-        error: 'Edital não encontrado.'
+        const response = await request(app)
+          .patch(`/notices/${notice_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .send(notice_payload)
+          .expect(403);
+  
+        const expected_notice_payload = {
+          error: 'Não tem permissão para aceder a essa rota.'
+        }; 
+  
+        expect(response.body).toMatchObject(expected_notice_payload);
       });
-    });
+    })
   });
 });

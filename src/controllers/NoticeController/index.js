@@ -17,7 +17,7 @@ const registerNotice = async (req, res) => {
   try {
     // Create a shallow copy of the notice's data from the request body.
     // This avoids mutating the original `req.body` directly.
-    const payload = { ...req.body, userId: req.user.id };
+    const payload = { ...req.body };
 
     // Create the new user in the database
     const notice_created = await Notice.create(payload);
@@ -48,7 +48,7 @@ const registerNotice = async (req, res) => {
  */
 const fetchNotices = async (req, res) => {
   try {
-    const notices = await Notice.find({ userId: req.user.id });
+    const notices = await Notice.find();
 
     return res
       .status(200)
@@ -79,7 +79,7 @@ const fetchNotice = async (req, res) => {
   try {
     const notice = await Notice.findById(req.params.noticeId);
 
-    if (!notice || notice?.userId.toString() !== req.user.id) {
+    if (!notice) {
       return res
         .status(404)
         .json({
@@ -118,7 +118,7 @@ const updateNotice = async (req, res) => {
 
     let notice = await Notice.findById(id);
 
-    if (!notice || notice?.userId.toString() !== req.user.id) {
+    if (!notice) {
       return res
         .status(404)
         .json({
@@ -163,7 +163,7 @@ const patchNotice = async (req, res) => {
 
     let notice = await Notice.findById(id);
 
-    if (!notice || notice?.userId.toString() !== req.user.id) {
+    if (!notice) {
       return res
         .status(404)
         .json({
@@ -208,7 +208,7 @@ const deleteNotice = async (req, res) => {
 
     let notice = await Notice.findById(id);
 
-    if (!notice || notice?.userId.toString() !== req.user.id) {
+    if (!notice) {
       return res
         .status(404)
         .json({
