@@ -139,7 +139,7 @@ describe('PATCH /notices/:noticeId', () => {
         .expect(400);
 
       expect(response.body).toMatchObject({
-        error: 'Pelo menos um dos campos "title", "description", "datePublished" or "link" tem de ser providenciado.'
+        error: 'Pelo menos um dos campos "title", "description", "datePublished" ou "link" deve ser providenciado.'
       });
     });
 

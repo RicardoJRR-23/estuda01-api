@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../../../app.js');
 const { dbConnect, dbDisconnect } = require('../../../__helpers__/mongodbServer/index.js');
 
-describe('Notices', () => {
+describe('Fetch Notices', () => {
   let user_access_token_with_notices;
   let user_access_token_without_notices;
   let notices = [];
