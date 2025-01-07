@@ -9,13 +9,12 @@ const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMid
 
 /**
  * @swagger
- * /notices:
  * /studyModules:
  *   post:
  *     summary: Create a new study module
  *     description: This endpoint creates a new nostudy module with the provided details. It validates the request payload according to the defined schema.
  *     tags:
- *       - studyModules
+ *       - StudyModules
  *     requestBody:
  *       required: true
  *       content:
@@ -129,7 +128,7 @@ router.post('/',
  *     summary: get a list of study modules
  *     description: This endpoint returns a list of study modules that belongs to the authenticated user.
  *     tags:
- *       - studyModules
+ *       - StudyModules
  *     responses:
  *       '200':
  *         description: study modules successfuly returned
@@ -202,7 +201,7 @@ router.get('/', Controller.fetchStudyModules);
  *     summary: get an instance of a study module
  *     description: This endpoint returns an study module that belongs to the authenticated user.
  *     tags:
- *       - studyModules
+ *       - StudyModules
  *     parameters:
  *       - in: path
  *         name: studyModuleId
@@ -291,7 +290,7 @@ router.get('/:studyModuleId', Controller.fetchStudyModule);
  *     summary: Fully updates a study module
  *     description: This endpoint updates an instance of a study module with the provided details. It validates the request payload according to the defined schema.
  *     tags:
- *       - studyModules
+ *       - StudyModules
  *     parameters:
  *       - in: path
  *         name: studyModuleId
@@ -371,7 +370,7 @@ router.put('/:studyModuleId',
  *     summary: Partially updates a study module
  *     description: This endpoint patches an instance of a study module with the provided details. It validates the request payload according to the defined schema.
  *     tags:
- *       - studyModules
+ *       - StudyModules
  *     parameters:
  *       - in: path
  *         name: studyModuleId
@@ -435,5 +434,37 @@ router.patch('/:studyModuleId',
   ValidateSchemaMiddleware(patch_schema),
   Controller.patchStudyModule
 );
+
+/**
+ * @swagger
+ * /studyModules/{studyModuleId}:
+ *   delete:
+ *     summary: Delete an instance of a study module
+ *     description: This endpoint deletes a created instance of a study module. It validates if the provided id matches an existing one on the database else it returns 404
+ *     tags:
+ *       - StudyModules
+ *     parameters:
+ *       - in: path
+ *         name: studyModuleId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: >
+ *           The ID of the study module that the user wants to delete
+ *     responses:
+ *       '204':
+ *         description: Study module successfuly deleted
+ *       '404':
+ *         description: Couldn't find the respective study module
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Módulo de Estudo não encontrado."
+ */
+router.delete('/:studyModuleId', Controller.deleteStudyModule);
 
 module.exports = router;
