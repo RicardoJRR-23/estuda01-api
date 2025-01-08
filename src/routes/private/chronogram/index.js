@@ -4,6 +4,7 @@ const {
   createController,
   findByUserIdController,
   findByIdController
+
 } = require('../../../controllers/ChronogramController');
 
 const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMiddleware');
@@ -163,6 +164,7 @@ router.post(
  *                         type: string
  *                         format: date-time
  *                         description: The end date of the chronogram
+
  *                       tasks:
  *                         type: array
  *                         items:
@@ -174,6 +176,7 @@ router.post(
  *                             completed:
  *                               type: boolean
  *                               description: Whether the task is completed or not
+
  *                       userId:
  *                         type: string
  *       401:
@@ -205,6 +208,7 @@ router.post(
  */
 
 router.get('/', findByUserIdController);
+
 
 
 /**
