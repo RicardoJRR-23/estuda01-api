@@ -6,12 +6,15 @@ const {
   findByIdController,
   putController,
   patchController
+
 } = require('../../../controllers/ChronogramController');
 
 const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMiddleware');
 const chronogram_post_schema = require('./chronogram_post_schema');
+
 const chronogram_put_schema = require('./chronogram_put_schema');
 const chronogram_patch_schema = require('./chronogram_patch_schema');
+
 
 /**
  * @swagger
@@ -156,6 +159,7 @@ router.post(
  *                     properties:
  *                       title:
  *                         type: string
+
  *                         description: The title of the chronogram
  *                       description:
  *                         type: string
@@ -175,6 +179,7 @@ router.post(
  *                           properties:
  *                             name:
  *                               type: string
+
  *                               description: The name of the task
  *                             completed:
  *                               type: boolean
@@ -228,6 +233,7 @@ router.get('/', findByUserIdController);
  *           type: string
  *         required: true
  *         description: The id of the chronogram. It is possible to get all the chronograms of a user by using the endpoint `/chronogram/`.
+
  *     responses:
  *       200:
  *         description: Chronogram found

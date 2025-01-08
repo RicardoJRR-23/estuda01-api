@@ -11,7 +11,6 @@ const { Chronogram } = require('../../models');
 
 /**
  * @function createController
- * @function createController
  * @description
  *  This function creates a chronogram
  *
@@ -127,6 +126,7 @@ const findByUserIdController = async (req, res) => {
  *
  */
 
+
 const findByIdController = async (req, res) => {
   try {
     const user_id = req.user.id;
@@ -148,6 +148,7 @@ const findByIdController = async (req, res) => {
     });
   }
 };
+
 
 /**
  * @function putController
@@ -242,7 +243,6 @@ module.exports = {
   findByIdController,
   putController,
   patchController
-};
 
 // Services
 // Responsible for the communication with the database
@@ -259,6 +259,7 @@ module.exports = {
 async function createService(chronogram_data) {
   return Chronogram.create(chronogram_data);
 }
+
 
 /**
  * Finds all chronograms that belong to the authenticated user.
@@ -330,13 +331,8 @@ async function FindByIdService(chronograma_id) {
 async function FindAllService() {
   return Chronogram.find();
 }
-
-async function FindByUserIdService(user_id) {
-  return Chronogram.find({ userId:user_id });
-}
-
-
 async function findByUserIdAndIdService(user_id, chronogram_id) {
   return Chronogram.find({ _id: chronogram_id, userId: user_id });
 }
-*/
+
+
