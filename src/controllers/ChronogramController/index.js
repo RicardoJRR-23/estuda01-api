@@ -322,17 +322,5 @@ async function parcialUpdateService(chronograma_id, chronogram_data) {
     }
   );
 }
-//TODO Implement the other services for future controllers to make
-/*
-async function FindByIdService(chronograma_id) {
-  return Chronogram.findById(chronograma_id);
-}
-
-async function FindAllService() {
-  return Chronogram.find();
-}
-async function findByUserIdAndIdService(user_id, chronogram_id) {
-  return Chronogram.find({ _id: chronogram_id, userId: user_id });
-}
 
 
