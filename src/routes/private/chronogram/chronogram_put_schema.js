@@ -11,26 +11,28 @@ module.exports = Joi.object({
     'string.base': 'Campo "title" deve ser do tipo String.',
     'any.required': 'Campo "title" está em falta.'
   }),
-  description: Joi.string().optional(),
+  description: Joi.string().allow(null, ''),
   startDate: Joi.date().iso().required().messages({
     'date.base':
       'Campo "startDate" deve ser uma data válida, exemplo: (1999-12-31)',
     'date.iso': 'Campo "startDate" deve estar no formato ISO 8601',
     'any.required': 'Campo "startDate" está em falta.'
   }),
-  endDate: Joi.date().iso().required().messages({
+  endDate: Joi.date().iso().required().greater(Joi.ref('startDate')).messages({
+    'date.greater': 'A data final deve ser maior que a data inicial.',
     'date.base':
       'Campo "endDate" deve ser uma data válida, exemplo: (1999-12-31)',
     'date.iso': 'Campo "endDate" deve estar no formato ISO 8601',
     'any.required': 'Campo "endDate" está em falta.'
   }),
-  tasks: Joi.array().items(
-    Joi.object({
-      name: Joi.string(),
-      completed: Joi.boolean()
-    })
-  ),
-  userId: Joi.string().required()
+  tasks: Joi.array()
+    .min(0)
+    .items(
+      Joi.object({
+        name: Joi.string(),
+        completed: Joi.boolean()
+      })
+    )
 })
   .required()
   .unknown(false)

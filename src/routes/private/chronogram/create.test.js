@@ -67,8 +67,7 @@ describe('Router Tests ', () => {
         tasks: [
           { name: 'Task 1', completed: false },
           { name: 'Task 2', completed: true }
-        ],
-        userId: user_id
+        ]
       };
 
       // Regex to validate the yyyy-mm-dd format
@@ -124,8 +123,7 @@ describe('Router Tests ', () => {
         description: 'Detalhes do erro',
         startDate: '2024-01-10',
         endDate: '2024-01-31',
-        tasks: [],
-        userId: '63f9e18e68d8d830f8e4f1a3'
+        tasks: []
       };
 
       const response = await request(app)
@@ -154,8 +152,7 @@ describe('Router Tests ', () => {
         description: 'Detalhes do erro',
         startDate: invalid_answers,
         endDate: '2024-01-31',
-        tasks: [],
-        userId: '63f9e18e68d8d830f8e4f1a3'
+        tasks: []
       };
 
       // Regex to validate the yyyy-mm-dd format
@@ -191,8 +188,7 @@ describe('Router Tests ', () => {
         description: 'Detalhes do erro',
         startDate: '2024-01-01',
         endDate: invalid_answers,
-        tasks: [],
-        userId: '63f9e18e68d8d830f8e4f1a3'
+        tasks: []
       };
 
       // Regex to validate the yyyy-mm-dd format
@@ -227,8 +223,7 @@ describe('Router Tests ', () => {
         tasks: [
           { name: 'Task 1', completed: false },
           { name: 'Task 2', completed: true }
-        ],
-        userId: '63f9e18e68d8d830f8e4f1a3'
+        ]
       };
 
       const response = await request(app)
