@@ -243,7 +243,7 @@ module.exports = {
   findByIdController,
   putController,
   patchController
-
+}
 // Services
 // Responsible for the communication with the database
 
