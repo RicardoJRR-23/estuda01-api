@@ -5,7 +5,8 @@ const {
   findByUserIdController,
   findByIdController,
   putController,
-  patchController
+  patchController,
+  deleteController
 } = require('../../../controllers/ChronogramController');
 
 const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMiddleware');
@@ -326,7 +327,7 @@ router.get('/:chronogram_id', findByIdController);
  *     summary: Updates a whole chronogram by its id
  *     description: >
  *         Update a chronogram by using its `chronogramId` as identifier of
- *         the chronogram created, if the user is authenticated. 
+ *         the chronogram created, if the user is authenticated.
  *         The empty fields or missing fields, that are not required on create, will be emptied or completed with null.
  *     tags: [Chronogram]
  *     parameters:
@@ -443,7 +444,7 @@ router.get('/:chronogram_id', findByIdController);
  *           application/json:
  *             schema:
  *               type: object
- *               properties:               
+ *               properties:
  *                 error:
  *                   type: string
  *                   description: Internal server error message
@@ -558,7 +559,7 @@ router.put(
  *             schema:
  *               type: object
  *               properties:
- *                 error: 
+ *                 error:
  *                   type: string
  *                   description: Bad request
  *                   example:
@@ -593,4 +594,46 @@ router.patch(
   ValidateSchemaMiddleware(chronogram_patch_schema),
   patchController
 );
+
+/**
+ * @swagger
+ * /chronogram/{chronogramId}:
+ *   delete:
+ *     summary: Delete a chronogram by id if owned by user
+ *     description: >
+ *         Deletes a chronogram by using its `chronogramId` as identifier, if the user is authenticated.
+ *     tags: [Chronogram]
+ *     parameters:
+ *       - in: path
+ *         name: chronogramId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The id of the chronogram. It is possible to get all the chronograms of a user by using the endpoint `/chronogram/`.
+ *     responses:
+ *       '200':
+ *         description: Chronogram successfuly deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Cronograma apagado com sucesso."
+ *       '404':
+ *         description: Couldn't find the specific chronogram
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Cronograma não encontrado."
+ *
+ */
+
+router.delete('/:chronogram_id', deleteController);
+
 module.exports = router;
