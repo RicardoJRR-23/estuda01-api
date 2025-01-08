@@ -1,5 +1,6 @@
 const { Chronogram } = require('../../models');
 
+
 /**
  * @description
  * This file contains the controllers for the Chronogram entity.
@@ -9,8 +10,19 @@ const { Chronogram } = require('../../models');
 //Controllers
 // Responsible for the communication between the routes and the services
 
+
 /**
  * @function createController
+ * @function createController
+ * @description
+ * This file contains the controllers for the Chronogram entity.
+ * and the services that communicate with the database.
+ */
+
+//Controllers
+// Responsible for the communication between the routes and the services
+
+/**
  * @function createController
  * @description
  *  This function creates a chronogram
@@ -126,6 +138,7 @@ const findByUserIdController = async (req, res) => {
  *
  *
  */
+
 
 const findByIdController = async (req, res) => {
   try {
@@ -299,6 +312,7 @@ async function createService(chronogram_data) {
   return Chronogram.create(chronogram_data);
 }
 
+
 /**
  * Finds all chronograms that belong to the authenticated user.
  *
@@ -375,22 +389,4 @@ async function deleteService(chronogram_id) {
   return Chronogram.findByIdAndDelete(chronogram_id);
 }
 
-//TODO Implement the other services for future controllers to make
-/*
-async function FindByIdService(chronograma_id) {
-  return Chronogram.findById(chronograma_id);
-}
 
-async function FindAllService() {
-  return Chronogram.find();
-}
-
-async function FindByUserIdService(user_id) {
-  return Chronogram.find({ userId:user_id });
-}
-
-
-async function findByUserIdAndIdService(user_id, chronogram_id) {
-  return Chronogram.find({ _id: chronogram_id, userId: user_id });
-}
-*/
