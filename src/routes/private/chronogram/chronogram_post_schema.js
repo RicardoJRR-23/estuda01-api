@@ -32,6 +32,7 @@ module.exports = Joi.object({
       completed: Joi.boolean()
     })
   )
+
 })
   .required()
   .unknown(false)
