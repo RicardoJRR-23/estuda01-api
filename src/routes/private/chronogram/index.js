@@ -164,6 +164,7 @@ router.post(
  *                         type: string
  *                         format: date-time
  *                         description: The end date of the chronogram
+
  *                       tasks:
  *                         type: array
  *                         items:
@@ -175,6 +176,7 @@ router.post(
  *                             completed:
  *                               type: boolean
  *                               description: Whether the task is completed or not
+
  *                       userId:
  *                         type: string
  *       401:
