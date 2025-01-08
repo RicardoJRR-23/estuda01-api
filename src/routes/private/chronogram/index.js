@@ -159,6 +159,7 @@ router.post(
  *                     properties:
  *                       title:
  *                         type: string
+
  *                         description: The title of the chronogram
  *                       description:
  *                         type: string
@@ -171,6 +172,7 @@ router.post(
  *                         type: string
  *                         format: date-time
  *                         description: The end date of the chronogram
+
  *                       tasks:
  *                         type: array
  *                         items:
@@ -178,10 +180,12 @@ router.post(
  *                           properties:
  *                             name:
  *                               type: string
+
  *                               description: The name of the task
  *                             completed:
  *                               type: boolean
  *                               description: Whether the task is completed or not
+
  *                       userId:
  *                         type: string
  *       401:
@@ -214,6 +218,7 @@ router.post(
 
 router.get('/', findByUserIdController);
 
+
 /**
  *
  * @swagger
@@ -231,6 +236,7 @@ router.get('/', findByUserIdController);
  *           type: string
  *         required: true
  *         description: The id of the chronogram. It is possible to get all the chronograms of a user by using the endpoint `/chronogram/`.
+
  *     responses:
  *       200:
  *         description: Chronogram found

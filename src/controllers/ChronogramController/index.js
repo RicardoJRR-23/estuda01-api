@@ -13,7 +13,6 @@ const { Chronogram } = require('../../models');
 
 /**
  * @function createController
- * @function createController
  * @description
  * This file contains the controllers for the Chronogram entity.
  * and the services that communicate with the database.
@@ -162,6 +161,7 @@ const findByIdController = async (req, res) => {
   }
 };
 
+
 /**
  * @function putController
  * @description
@@ -296,6 +296,7 @@ module.exports = {
   deleteController
 };
 
+
 // Services
 // Responsible for the communication with the database
 
@@ -388,5 +389,3 @@ async function parcialUpdateService(chronograma_id, chronogram_data) {
 async function deleteService(chronogram_id) {
   return Chronogram.findByIdAndDelete(chronogram_id);
 }
-
-
