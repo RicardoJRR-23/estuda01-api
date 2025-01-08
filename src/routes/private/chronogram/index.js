@@ -3,11 +3,16 @@ const router = express.Router();
 const {
   createController,
   findByUserIdController,
-  findByIdController
+  findByIdController,
+  putController,
+  patchController
 } = require('../../../controllers/ChronogramController');
 
 const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMiddleware');
 const chronogram_post_schema = require('./chronogram_post_schema');
+const chronogram_put_schema = require('./chronogram_put_schema');
+const chronogram_patch_schema = require('./chronogram_patch_schema');
+
 /**
  * @swagger
  * /chronogram/:
@@ -57,12 +62,12 @@ const chronogram_post_schema = require('./chronogram_post_schema');
  *               startDate: "2024-01-01"
  *               endDate: "2024-01-31"
  *               tasks: [
- *                  { 
- *                    name: "Task 1", 
- *                    completed: "false" 
+ *                  {
+ *                    name: "Task 1",
+ *                    completed: "false"
  *                  },
- *                  { 
- *                    name: "Task 2", 
+ *                  {
+ *                    name: "Task 2",
  *                    completed: "true"
  *                  }
  *               ]
@@ -206,7 +211,6 @@ router.post(
 
 router.get('/', findByUserIdController);
 
-
 /**
  *
  * @swagger
@@ -314,4 +318,279 @@ router.get('/', findByUserIdController);
 
 router.get('/:chronogram_id', findByIdController);
 
+/**
+ *
+ * @swagger
+ * /chronogram/{chronogramId}:
+ *   put:
+ *     summary: Updates a whole chronogram by its id
+ *     description: >
+ *         Update a chronogram by using its `chronogramId` as identifier of
+ *         the chronogram created, if the user is authenticated. 
+ *         The empty fields or missing fields, that are not required on create, will be emptied or completed with null.
+ *     tags: [Chronogram]
+ *     parameters:
+ *       - in: path
+ *         name: chronogramId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The id of the chronogram. It is possible to get all the chronograms of a user by using the endpoint `/chronogram/`.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: The title of the chronogram
+ *                 example:
+ *                   'Cronograma de exemplo'
+ *               description:
+ *                 type: string
+ *                 description: The description of the chronogram
+ *                 example:
+ *                   'Descrição do cronograma de exemplo'
+ *               startDate:
+ *                 type: string
+ *                 format: date-time
+ *                 example:
+ *                   '1999-12-01T23:59:59.999Z'
+ *               endDate:
+ *                 type: string
+ *                 format: date-time
+ *                 example:
+ *                   '1999-12-31T23:59:59.999Z'
+ *               tasks:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: 'Tarefa 1'
+ *                     completed:
+ *                       type: boolean
+ *                       example: false
+ *     responses:
+ *       200:
+ *         description: Chronogram updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                   description: The title of the chronogram
+ *                   example:
+ *                     'Cronograma de exemplo'
+ *                 description:
+ *                   type: string
+ *                   description: The description of the chronogram
+ *                   example:
+ *                     'Descrição do cronograma de exemplo'
+ *                 startDate:
+ *                   type: string
+ *                   format: date-time
+ *                   example:
+ *                     '1999-12-01T23:59:59.999Z'
+ *                 endDate:
+ *                   type: string
+ *                   format: date-time
+ *                   example:
+ *                     '1999-12-31T23:59:59.999Z'
+ *                 tasks:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                         example: 'Tarefa 1'
+ *                       completed:
+ *                         type: boolean
+ *                         example: false
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Bad request
+ *                   example:
+ *                    'Campo \"title\" está em falta.'
+ *       404:
+ *         description: Chronogram not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Chronogram not found
+ *                   example:
+ *                    'Cronograma não encontrado.'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:               
+ *                 error:
+ *                   type: string
+ *                   description: Internal server error message
+ *                   example:
+ *                    'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+ */
+router.put(
+  '/:chronogram_id',
+  ValidateSchemaMiddleware(chronogram_put_schema),
+  putController
+);
+
+/**
+ *
+ * @swagger
+ * /chronogram/{chronogramId}:
+ *   patch:
+ *     summary: Update specific fields of a chronogram by id
+ *     description: >
+ *         Update a chronogram by using its `chronogramId` as identifier of
+ *         the chronogram created, if the user is authenticated.
+ *         The missing fields, that are not required on create, will not be updated.
+ *     tags: [Chronogram]
+ *     parameters:
+ *       - in: path
+ *         name: chronogramId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The id of the chronogram. It is possible to get all the chronograms of a user by using the endpoint `/chronogram/`.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: The title of the chronogram
+ *                 example:
+ *                   'Cronograma de exemplo'
+ *               description:
+ *                 type: string
+ *                 description: The description of the chronogram
+ *                 example:
+ *                   'Descrição do cronograma de exemplo'
+ *               startDate:
+ *                 type: string
+ *                 format: date-time
+ *                 example:
+ *                   '1999-12-01T23:59:59.999Z'
+ *               endDate:
+ *                 type: string
+ *                 format: date-time
+ *                 example:
+ *                   '1999-12-31T23:59:59.999Z'
+ *               tasks:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: 'Tarefa 1'
+ *                     completed:
+ *                       type: boolean
+ *                       example: false
+ *     responses:
+ *       200:
+ *         description: Chronogram updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                   description: The title of the chronogram
+ *                   example:
+ *                     'Cronograma de exemplo'
+ *                 description:
+ *                   type: string
+ *                   description: The description of the chronogram
+ *                   example:
+ *                     'Descrição do cronograma de exemplo'
+ *                 startDate:
+ *                   type: string
+ *                   format: date-time
+ *                   example:
+ *                     '1999-12-01T23:59:59.999Z'
+ *                 endDate:
+ *                   type: string
+ *                   format: date-time
+ *                   example:
+ *                     '1999-12-31T23:59:59.999Z'
+ *                 tasks:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                         example: 'Tarefa 1'
+ *                       completed:
+ *                         type: boolean
+ *                         example: false
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error: 
+ *                   type: string
+ *                   description: Bad request
+ *                   example:
+ *                    'Requisição inválida.'
+ *       404:
+ *         description: Chronogram not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Chronogram not found
+ *                   example:
+ *                    'Cronograma não encontrado.'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Internal server error message
+ *                   example:
+ *                    'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+ */
+router.patch(
+  '/:chronogram_id',
+  ValidateSchemaMiddleware(chronogram_patch_schema),
+  patchController
+);
 module.exports = router;
