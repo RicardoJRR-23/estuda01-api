@@ -12,6 +12,7 @@ module.exports = Joi.object({
     'any.required': 'Campo "title" está em falta.'
   }),
   description: Joi.string().optional(),
+
   startDate: Joi.date().iso().required().messages({
     'date.base':
       'Campo "startDate" deve ser uma data válida, exemplo: (1999-12-31)',
@@ -30,6 +31,7 @@ module.exports = Joi.object({
       completed: Joi.boolean()
     })
   )
+
 })
   .required()
   .unknown(false)

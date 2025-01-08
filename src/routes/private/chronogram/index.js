@@ -4,6 +4,7 @@ const {
   createController,
   findByUserIdController,
   findByIdController
+
 } = require('../../../controllers/ChronogramController');
 
 const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMiddleware');
@@ -205,6 +206,8 @@ router.post(
  */
 
 router.get('/', findByUserIdController);
+
+
 
 
 /**
