@@ -1,6 +1,18 @@
 const { Chronogram } = require('../../models');
 
+
 /**
+ * @description
+ * This file contains the controllers for the Chronogram entity.
+ * and the services that communicate with the database.
+ */
+
+//Controllers
+// Responsible for the communication between the routes and the services
+
+
+/**
+ * @function createController
  * @description
  * This file contains the controllers for the Chronogram entity.
  * and the services that communicate with the database.
@@ -237,13 +249,54 @@ const patchController = async (req, res) => {
   }
 };
 
+
+/**
+ * @function deleteController
+ * @description
+ * Deletes an existing chronogram that belongs to the authenticated user.
+ * Handles various error scenarios and sends appropriate HTTP responses.
+ *
+ * @param {Object} req - The Express request object, containing the user ID in `req.user.id` and the chronogram ID in `req.params.chronogram_id`.
+ * @param {Object} res - The response object used to send back the HTTP response.
+ *
+ * @returns {Object} - Returns a JSON response with a status code:
+ *  - 200: If the chronogram is deleted successfully.
+ *  - 404: If the chronogram is not found or does not belong to the user.
+ *  - 500: If an unexpected server error occurs.
+ */
+const deleteController = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { chronogram_id } = req.params;
+    const found = await findByUserIdAndIdService(user_id, chronogram_id);
+
+    if (found.length === 0) {
+      return res.status(404).json({
+        error: 'Cronograma não encontrado.'
+      });
+    }
+
+    await deleteService(chronogram_id);
+    console.info('Chronogram deleted successfully.');
+    return res.status(200).json({ message: 'Cronograma apagado com sucesso.' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+    });
+  }
+};
+
 module.exports = {
   createController,
   findByUserIdController,
   findByIdController,
   putController,
-  patchController
-}
+  patchController,
+  deleteController
+};
+
+
 // Services
 // Responsible for the communication with the database
 
@@ -323,4 +376,16 @@ async function parcialUpdateService(chronograma_id, chronogram_data) {
   );
 }
 
+/**
+ * Deletes a chronogram by its ID from the database.
+ *
+ * @async
+ * @function deleteService
+ * @param {string} chronogram_id - The ID of the chronogram to be deleted.
+ *
+ * @returns {Promise<Object|null>} - Returns a promise that resolves to the deleted chronogram object if found, or null if not found.
+ */
 
+async function deleteService(chronogram_id) {
+  return Chronogram.findByIdAndDelete(chronogram_id);
+}
