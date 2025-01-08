@@ -3,7 +3,8 @@ const router = express.Router();
 const {
   createController,
   findByUserIdController,
-  findByIdController,
+  findByIdController
+
 } = require('../../../controllers/ChronogramController');
 
 const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMiddleware');
@@ -13,13 +14,18 @@ const chronogram_post_schema = require('./chronogram_post_schema');
  * /chronogram/:
  *   post:
  *     summary: Create a new chronogram
- *     tags: [Chronogram]
+ *     tags:
+ *       - Chronogram
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - title
+ *               - startDate
+ *               - endDate
  *             properties:
  *               title:
  *                 type: string
@@ -46,14 +52,21 @@ const chronogram_post_schema = require('./chronogram_post_schema');
  *                     completed:
  *                       type: boolean
  *                       description: Whether the task is completed or not
- *               userId:
- *                 type: string
- *                 description: The id of the user
- *             required:
- *               - title
- *               - startDate
- *               - endDate
- *               - userId
+ *             example:
+ *               title: "Novo Cronograma"
+ *               description: "Detalhes do cronograma"
+ *               startDate: "2024-01-01"
+ *               endDate: "2024-01-31"
+ *               tasks: [
+ *                  { 
+ *                    name: "Task 1", 
+ *                    completed: "false" 
+ *                  },
+ *                  { 
+ *                    name: "Task 2", 
+ *                    completed: "true"
+ *                  }
+ *               ]
  *     responses:
  *       201:
  *         description: Chronogram created successfully
@@ -84,8 +97,7 @@ const chronogram_post_schema = require('./chronogram_post_schema');
  *                             type: string
  *                           completed:
  *                             type: boolean
- *                     userId:
- *                       type: string
+ *
  *       400:
  *         description: Bad request. Missing or wrongly filled required fields or invalid fields
  *         content:
@@ -140,14 +152,19 @@ router.post(
  *                     properties:
  *                       title:
  *                         type: string
+ *                         description: The title of the chronogram
  *                       description:
  *                         type: string
+ *                         description: The description of the chronogram
  *                       startDate:
  *                         type: string
  *                         format: date-time
+ *                         description: The start date of the chronogram
  *                       endDate:
  *                         type: string
  *                         format: date-time
+ *                         description: The end date of the chronogram
+
  *                       tasks:
  *                         type: array
  *                         items:
@@ -155,8 +172,11 @@ router.post(
  *                           properties:
  *                             name:
  *                               type: string
+ *                               description: The name of the task
  *                             completed:
  *                               type: boolean
+ *                               description: Whether the task is completed or not
+
  *                       userId:
  *                         type: string
  *       401:
@@ -189,6 +209,8 @@ router.post(
 
 router.get('/', findByUserIdController);
 
+
+
 /**
  *
  * @swagger
@@ -199,6 +221,13 @@ router.get('/', findByUserIdController);
  *         Get a chronogram by using its `chronogramId` as identifier of
  *         the chronogram created, if the user is authenticated.
  *     tags: [Chronogram]
+ *     parameters:
+ *       - in: path
+ *         name: chronogramId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The id of the chronogram. It is possible to get all the chronograms of a user by using the endpoint `/chronogram/`.
  *     responses:
  *       200:
  *         description: Chronogram found
