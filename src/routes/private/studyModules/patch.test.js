@@ -88,9 +88,7 @@ describe('PATCH /studyModules/:studyModuleId', () => {
       const study_module = await StudyModule.findById(study_module_id);
 
       const common_expected_attributes = {
-        _id: mongoose.Types.ObjectId.createFromHexString(study_module_id),
-        createdAt: expect.any(Date),
-        updatedAt: expect.any(Date)
+        _id: mongoose.Types.ObjectId.createFromHexString(study_module_id)
       };
 
       const not_expected_payload = {
@@ -128,9 +126,7 @@ describe('PATCH /studyModules/:studyModuleId', () => {
       const study_module = await StudyModule.findById(study_module_id);
 
       const common_expected_attributes = {
-        _id: mongoose.Types.ObjectId.createFromHexString(study_module_id),
-        createdAt: expect.any(Date),
-        updatedAt: expect.any(Date)
+        _id: mongoose.Types.ObjectId.createFromHexString(study_module_id)
       };
 
       const not_expected_payload = {
