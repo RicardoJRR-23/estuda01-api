@@ -18,14 +18,6 @@ const UserSchema = new mongoose.Schema({
     type: String, 
     num: ['student', 'admin'],
     default: 'student'
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now()
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now()
   }
 }, { timestamps: true });
 

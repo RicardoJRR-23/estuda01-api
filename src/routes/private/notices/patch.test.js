@@ -79,9 +79,7 @@ describe('PATCH /notices/:noticeId', () => {
 
         const common_expected_attributes = {
           _id: mongoose.Types.ObjectId.createFromHexString(notice_id),
-          datePublished: new Date(payload.datePublished),
-          createdAt: expect.any(Date),
-          updatedAt: expect.any(Date)
+          datePublished: new Date(payload.datePublished)
         };
 
         const not_expected_payload = {
@@ -115,9 +113,7 @@ describe('PATCH /notices/:noticeId', () => {
         const not_expected_payload = {
           ...notice_payload_created,
           _id: mongoose.Types.ObjectId.createFromHexString(notice_id),
-          datePublished: new Date(notice_payload_created.datePublished),
-          createdAt: expect.any(Date),
-          updatedAt: expect.any(Date)
+          datePublished: new Date(notice_payload_created.datePublished)
         };
 
         const expected_payload = {

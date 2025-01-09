@@ -172,9 +172,8 @@ const patchStudyModule = async (req, res) => {
     }
 
     const payload = req.body;
-    payload.updatedAt = Date.now();
 
-    await StudyModule.updateOne({ _id: id }, payload);
+    await StudyModule.updateOne({ _id: id }, { $set: payload });
 
     return res
       .status(204)

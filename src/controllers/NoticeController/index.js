@@ -114,22 +114,22 @@ const fetchNotice = async (req, res) => {
  */
 const updateNotice = async (req, res) => {
   try {
-    const id = req.params.noticeId;
+    const { noticeId } = req.params;
+    const payload = req.body;
+  
+    const updatedNotice = await Notice.findByIdAndUpdate(
+      noticeId,
+      payload,
+      { new: true, runValidators: true } // Options: return the updated document and run validation
+    );
 
-    let notice = await Notice.findById(id);
-
-    if (!notice) {
+    if (!updatedNotice) {
       return res
         .status(404)
         .json({
           error: 'Edital não encontrado.'
         });
     }
-
-    const payload = req.body;
-    payload.updatedAt = Date.now();
-
-    await Notice.updateOne({ _id: id }, payload);
 
     return res
       .status(204)
@@ -159,22 +159,22 @@ const updateNotice = async (req, res) => {
  */
 const patchNotice = async (req, res) => {
   try {
-    const id = req.params.noticeId;
+    const { noticeId } = req.params;
+    const payload = req.body;
+  
+    const updatedNotice = await Notice.findByIdAndUpdate(
+      noticeId,
+      { $set: payload },
+      { new: true, runValidators: true } // Options: return the updated document and run validation
+    );
 
-    let notice = await Notice.findById(id);
-
-    if (!notice) {
+    if (!updatedNotice) {
       return res
         .status(404)
         .json({
           error: 'Edital não encontrado.'
         });
     }
-
-    const payload = req.body;
-    payload.updatedAt = Date.now();
-
-    await Notice.updateOne({ _id: id }, payload);
 
     return res
       .status(204)

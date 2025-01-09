@@ -16,14 +16,6 @@ const NoticeSchema = new mongoose.Schema({
   link: {
     type: String, 
     required: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now()
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now()
   }
 }, { timestamps: true });
 
