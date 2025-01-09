@@ -67,11 +67,11 @@ const chronogram_patch_schema = require('./chronogram_patch_schema');
  *               tasks: [
  *                  {
  *                    name: "Task 1",
- *                    completed: "false"
+ *                    completed: false
  *                  },
  *                  {
  *                    name: "Task 2",
- *                    completed: "true"
+ *                    completed: true
  *                  }
  *               ]
  *     responses:
@@ -114,8 +114,7 @@ const chronogram_patch_schema = require('./chronogram_patch_schema');
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Campo \"title\" deve ser do tipo String."
- *
+ *                   description: Bad request
  *       500:
  *         description: Internal server error
  *         content:
@@ -584,7 +583,6 @@ router.put(
  *                   description: Chronogram not found
  *                   example:
  *                    'Cronograma não encontrado.'
- *                   example: "Campo \"title\" deve ser do tipo String."
  *
  *       500:
  *         description: Internal server error
