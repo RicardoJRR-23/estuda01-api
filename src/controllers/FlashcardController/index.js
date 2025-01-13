@@ -1,6 +1,5 @@
 const { Flashcard } = require('../../models');
 const mongoose = require('mongoose');
-
 /**
  * @function createOneOrManyController
  * @description
@@ -149,8 +148,10 @@ const findByIdController = async (req, res) => {
         .json({ message: 'O flashcard não foi encontrado' });
     } else {
       if (flashcard.userId.toString() === req.user.id) {
+        //TODO  aplicar possível redirect return res.redirect('/nova-pagina');
         return res.status(200).json({ message: 'É meu flashcard', flashcard });
       } else {
+        //TODO  aplicar possível redirect return res.redirect('/nova-pagina');
         return res.status(200).json({
           message: 'Não é meu flashcard',
           flashcard
