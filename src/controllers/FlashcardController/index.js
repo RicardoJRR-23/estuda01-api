@@ -1,6 +1,5 @@
 const { Flashcard } = require('../../models');
 const mongoose = require('mongoose');
-
 /**
  * @function createOneOrManyController
  * @description
@@ -149,8 +148,10 @@ const findByIdController = async (req, res) => {
         .json({ message: 'O flashcard não foi encontrado' });
     } else {
       if (flashcard.userId.toString() === req.user.id) {
+        //TODO  aplicar possível redirect return res.redirect('/nova-pagina');
         return res.status(200).json({ message: 'É meu flashcard', flashcard });
       } else {
+        //TODO  aplicar possível redirect return res.redirect('/nova-pagina');
         return res.status(200).json({
           message: 'Não é meu flashcard',
           flashcard
@@ -159,6 +160,105 @@ const findByIdController = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
+    return res.status(500).json({
+      error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+    });
+  }
+};
+
+/**
+ * @function putController
+ * @description
+ *  Updates a flashcard by its ID, ensuring it belongs to the authenticated user.
+ *  Validates the request payload and handles various error scenarios.
+ *
+ * @param {Object} req - The request object containing the user ID in `req.user.id`,
+ *                       flashcard ID in `req.params.flashcardId`, and update payload in `req.body`.
+ * @param {Object} res - The response object used to send back the HTTP response.
+ *
+ * @returns {Object} - Returns a JSON response with a status code:
+ *  - 200: If the flashcard is successfully updated.
+ *  - 400: If the payload is invalid or a validation error occurs.
+ *  - 404: If the flashcard is not found.
+ *  - 500: If an unexpected server error occurs.
+ */
+
+const putController = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { flashcardId } = req.params;
+    const update_payload = req.body;
+
+    if (
+      !update_payload ||
+      !flashcardId ||
+      !update_payload.question ||
+      !update_payload.answer
+    ) {
+      return res.status(400).json({
+        error: 'Payload inválido. Verifique os dados enviados.'
+      });
+    }
+    if (!update_payload.subject) {
+      update_payload.subject = null;
+    }
+    const found = await findByIdAndUserIdService(flashcardId, user_id);
+    if (found.length === 0) {
+      return res.status(404).json({
+        error: `O Flashcard não foi encontrado.`
+      });
+    }
+    const response = await totalUpdateService(flashcardId, update_payload);
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error(error);
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: error.message });
+    }
+    return res.status(500).json({
+      error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+    });
+  }
+};
+
+/**
+ * @function patchController
+ * @description
+ *  Updates specific fields of a flashcard by its ID, ensuring it belongs to the authenticated user.
+ *  Validates the request payload and handles various error scenarios.
+ *
+ * @param {Object} req - The request object containing the user ID in `req.user.id`,
+ *                       flashcard ID in `req.params.flashcardId`, and update payload in `req.body`.
+ * @param {Object} res - The response object used to send back the HTTP response.
+ *
+ * @returns {Object} - Returns a JSON response with a status code:
+ *  - 200: If the flashcard is successfully updated.
+ *  - 400: If the payload is invalid or a validation error occurs.
+ *  - 404: If the flashcard is not found.
+ *  - 500: If an unexpected server error occurs.
+ */
+
+const patchController = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const { flashcardId } = req.params;
+    const update_payload = req.body;
+
+    const found = await findByIdAndUserIdService(flashcardId, user_id);
+    if (found.length === 0) {
+      return res.status(404).json({
+        error: `O Flashcard não foi encontrado.`
+      });
+    }
+    const response = await specificUpdateService(flashcardId, update_payload);
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error(error);
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: error.message });
+    }
     return res.status(500).json({
       error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
     });
@@ -210,16 +310,69 @@ async function findAllService() {
  *
  * @async
  * @function findByIdService
- * @param {string} chronogram_id - The ID of the flashcard.
+ * @param {string} flashcard_id - The ID of the flashcard.
  *
  * @returns {Promise<Object>} - Returns a promise that resolves to the flashcard object if found, or null if not found.
  */
-async function findByIdService(chronogram_id) {
-  return Flashcard.findOne({ _id: chronogram_id });
+async function findByIdService(flashcard_id) {
+  return Flashcard.findOne({ _id: flashcard_id });
+}
+
+/**
+ * Finds a flashcard by its ID and verifies if it belongs to the authenticated user.
+ *
+ * @async
+ * @function findByIdAndUserIdService
+ * @param {string} flashcard_id - The ID of the flashcard.
+ * @param {string} user_id - The ID of the user.
+ *
+ * @returns {Promise<Object[]>} - Returns a promise that resolves to an array containing the flashcard object if found, or an empty array if not found.
+ */
+async function findByIdAndUserIdService(flashcard_id, user_id) {
+  return Flashcard.find({ _id: flashcard_id, userId: user_id });
+}
+
+/**
+ * Updates a flashcard document in the database, replacing all fields with the provided data.
+ *
+ * @async
+ * @function totalUpdateService
+ * @param {string} flashcard_id - The ID of the flashcard to be updated.
+ * @param {Object} flashcard_data - An object containing the fields to update with their new values.
+ *
+ * @returns {Promise<Object|null>} - Returns a promise that resolves to the updated flashcard object if found, or null if not found.
+ */
+async function totalUpdateService(flashcard_id, flashcard_data) {
+  return Flashcard.findByIdAndUpdate(flashcard_id, flashcard_data, {
+    new: true
+  });
+}
+
+/**
+ * Updates specific fields of a flashcard document in the database.
+ *
+ * @async
+ * @function specificUpdateService
+ * @param {string} flashcard_id - The ID of the flashcard to be updated.
+ * @param {Object} flashcard_data - An object containing the fields to update with their new values.
+ *
+ * @returns {Promise<Object|null>} - Returns a promise that resolves to the updated flashcard object if found, or null if not found.
+ */
+
+async function specificUpdateService(flashcard_id, flashcard_data) {
+  return Flashcard.findByIdAndUpdate(
+    { _id: flashcard_id },
+    { $set: flashcard_data },
+    {
+      new: true
+    }
+  );
 }
 
 module.exports = {
   createOneOrManyController,
   findAllController,
-  findByIdController
+  findByIdController,
+  putController,
+  patchController
 };
