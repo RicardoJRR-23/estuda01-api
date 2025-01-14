@@ -347,6 +347,18 @@ async function totalUpdateService(flashcard_id, flashcard_data) {
     new: true
   });
 }
+
+/**
+ * Updates specific fields of a flashcard document in the database.
+ *
+ * @async
+ * @function specificUpdateService
+ * @param {string} flashcard_id - The ID of the flashcard to be updated.
+ * @param {Object} flashcard_data - An object containing the fields to update with their new values.
+ *
+ * @returns {Promise<Object|null>} - Returns a promise that resolves to the updated flashcard object if found, or null if not found.
+ */
+
 async function specificUpdateService(flashcard_id, flashcard_data) {
   return Flashcard.findByIdAndUpdate(
     { _id: flashcard_id },
