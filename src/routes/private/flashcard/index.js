@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  createOneOrManyController
+  createOneOrManyController,
+  findAllController,
+  findByIdController
 } = require('../../../controllers/FlashcardController');
 
 const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMiddleware');
@@ -135,5 +137,124 @@ router.post(
   ValidateSchemaMiddleware(flashcard_post_many_schema),
   createOneOrManyController
 );
+
+/**
+ * @swagger
+ * /flashcard/:
+ *   get:
+ *    tags:
+ *      - Flashcard
+ *    summary: Get all flashcards
+ *    responses:
+ *      200:
+ *        description: All flashcards
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                type: object
+ *                properties:
+ *                  question:
+ *                    type: string
+ *                  answer:
+ *                    type: string
+ *                  subject:
+ *                    type: string
+ *                  userId:
+ *                    type: string
+ *                  createdAt:
+ *                    type: string
+ *                  updatedAt:
+ *                    type: string
+ *      401:
+ *        description: Unauthorized access to user information
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                error:
+ *                  type: string
+ *                  description: Unauthorized access to user information
+ *                  example:
+ *                    'Token não foi enviado.'
+ *      500:
+ *        description: Internal server error
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                error:
+ *                  type: string
+ *                  description: Internal server error message
+ *                  example:
+ *                    'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+ */
+
+router.get('/', findAllController);
+
+/** @swagger
+ * /flashcard/{flashcardId}:
+ *   get:
+ *    tags:
+ *      - Flashcard
+ *    summary: Get flashcard by ID
+ *    parameters:
+ *      - name: flashcardId
+ *        in: path
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: Flashcard by ID
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                question:
+ *                  type: string
+ *                answer:
+ *                  type: string
+ *                subject:
+ *                  type: string
+ *                userId:
+ *                  type: string
+ *                createdAt:
+ *                  type: string
+ *                updatedAt:
+ *                  type: string
+ *      401:
+ *        description: Unauthorized access to user information
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                error:
+ *                  type: string
+ *                  description: Unauthorized access to user information
+ *                  example:
+ *                    'Token não foi enviado.'
+ *      500:
+ *        description: Internal server error
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                error:
+ *                  type: string
+ *                  description: Internal server error message
+ *                  example:
+ *                    'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+ */
+
+router.get('/:flashcardId', findByIdController);
+
+
 
 module.exports = router;
