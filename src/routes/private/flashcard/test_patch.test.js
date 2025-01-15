@@ -8,7 +8,6 @@ const {
   dbConnect,
   dbDisconnect
 } = require('../../../__helpers__/mongodbServer/index.js');
-const { invalid } = require('joi');
 
 describe('Router Tests ', () => {
   //Pre-requisites: User register and session simulation
@@ -184,7 +183,7 @@ describe('Router Tests ', () => {
       describe('400 - Bad Request', () => {
         describe('Unexpected Field Values', () => {
           it('should return 400 if updated Flashcard have an unexpected field', async () => {
-            // Invalid values ​​for fields question and answer
+            // Invalid values for fields question and answer
 
             const invalid_payload_update = {
               question: 'Updated question ',
@@ -203,7 +202,7 @@ describe('Router Tests ', () => {
             console.error(normalize(response.body.error));
           });
           it('should return 400 if updated Flashcard have an invalid playload', async () => {
-            // Invalid values ​​for fields question and answer
+            // Invalid values for fields question and answer
             const invalidQuestions = [[], {}, null];
             const invalidAnswers = [[], {}, null];
             for (let i = 0; i < invalidQuestions.length; i++) {
@@ -225,7 +224,7 @@ describe('Router Tests ', () => {
           });
 
           it('should return 400 if unexpected `subject` value in form', async () => {
-            // Invalid values ​​for fields question and answer
+            // Invalid values for fields question and answer
             const invalidSubjects = [[], {}];
             for (const invalidSubject of invalidSubjects) {
               const invalid_payload_update = {
