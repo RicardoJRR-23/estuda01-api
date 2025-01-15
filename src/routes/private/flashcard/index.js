@@ -6,7 +6,8 @@ const {
   findAllController,
   findByIdController,
   putController,
-  patchController
+  patchController,
+  deleteController
 } = require('../../../controllers/FlashcardController');
 
 const ValidateSchemaMiddleware = require('../../../middlewares/ValidateSchemaMiddleware');
@@ -418,5 +419,56 @@ router.patch(
   ValidateSchemaMiddleware(flashcard_patch_many_schema),
   patchController
 );
+
+/**
+ * @swagger
+ * /flashcard/{flashcardId}:
+ *   delete:
+ *    tags:
+ *      - Flashcard
+ *    summary: Delete a flashcard by id if owned by user
+ *    parameters:
+ *      - name: flashcardId
+ *        in: path
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: Flashcard deleted successfully
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  example: "Flashcard deleted successfully"
+ *      401:
+ *        description: Unauthorized access to user information
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                error:
+ *                  type: string
+ *                  description: Unauthorized access to user information
+ *                  example:
+ *                    'Token não foi enviado.'
+ *      500:
+ *        description: Internal server error
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                error:
+ *                  type: string
+ *                  description: Internal server error message
+ *                  example:
+ *                    'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+ */
+router.delete('/:flashcardId', deleteController);
 
 module.exports = router;
