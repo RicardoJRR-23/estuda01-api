@@ -97,7 +97,7 @@ describe('Router Tests ', () => {
 
   beforeEach(async () => {
     flashcard_created = await request(app)
-      .post('/flashcard/')
+      .post('/flashcards/')
       .set('Authorization', `Bearer ${authentication_token}`)
       .send(flashcard_payload);
   });
@@ -111,12 +111,12 @@ describe('Router Tests ', () => {
     flashcard_created.length = 0;
   });
 
-  describe('delete /flashcard/:flashcardId', () => {
+  describe('delete /flashcards/:flashcardId', () => {
     describe('Success Cases', () => {
       describe('200 - OK', () => {
         it('should return 200 if the flashcard is deleted', async () => {
           const response = await request(app)
-            .delete(`/flashcard/${flashcard_created.body._id}`)
+            .delete(`/flashcards/${flashcard_created.body._id}`)
             .set('Authorization', `Bearer ${authentication_token}`);
 
           expect(response.status).toBe(200);
@@ -125,7 +125,7 @@ describe('Router Tests ', () => {
         });
         it('should return 200 if the admin tries to delete a flashcard', async () => {
           const response = await request(app)
-            .delete(`/flashcard/${flashcard_created.body._id}`)
+            .delete(`/flashcards/${flashcard_created.body._id}`)
             .set('Authorization', `Bearer ${admin_access_token}`);
 
           expect(response.status).toBe(200);
@@ -137,7 +137,7 @@ describe('Router Tests ', () => {
       describe('401 - Unauthorized', () => {
         it('should return 401 if the user is not authenticated', async () => {
           const response = await request(app).delete(
-            `/flashcard/${flashcard_created.body._id}`
+            `/flashcards/${flashcard_created.body._id}`
           );
           expect(response.status).toBe(401);
           expect(response.body.error).toBe('Token não foi enviado.');
@@ -145,7 +145,7 @@ describe('Router Tests ', () => {
         it('should return 401 if the user is not authorized', async () => {
           const invalid_token = 'invalid_token';
           const response = await request(app)
-            .delete(`/flashcard/${flashcard_created.body._id}`)
+            .delete(`/flashcards/${flashcard_created.body._id}`)
             .set('Authorization', `Bearer ${invalid_token}`);
 
           expect(response.status).toBe(401);
@@ -155,7 +155,7 @@ describe('Router Tests ', () => {
       describe('404 - Not Found', () => {
         it('should return 404 if the flashcard with the given ID is not found', async () => {
           const response = await request(app)
-            .delete(`/flashcard/098765432167890543215678`)
+            .delete(`/flashcards/098765432167890543215678`)
             .set('Authorization', `Bearer ${authentication_token}`);
 
           expect(response.status).toBe(404);
@@ -165,7 +165,7 @@ describe('Router Tests ', () => {
       describe('403 - Forbidden', () => {
         it('Should return 403 if the flashcard id is found but does not belong to the authenticated user, and the user is not admin', async () => {
           const response = await request(app)
-            .delete(`/flashcard/${flashcard_created.body._id}`)
+            .delete(`/flashcards/${flashcard_created.body._id}`)
             .set('authorization', `Bearer ${jhon_doe_access_token}`);
 
           expect(response.status).toBe(403);
@@ -176,10 +176,10 @@ describe('Router Tests ', () => {
           jest.spyOn(Flashcard, 'findByIdAndDelete').mockImplementation(() => {
             throw new Error('Unexpected Error');
           });
-          // Mock of the model return (see example in the file'src/models/Flashcard/index.js')
+          // Mock of the model return (see example in the file'src/models/Flashcards/index.js')
 
           const response = await request(app)
-            .delete(`/flashcard/${flashcard_created.body._id}`)
+            .delete(`/flashcards/${flashcard_created.body._id}`)
             .set('Authorization', `Bearer ${authentication_token}`);
 
           expect(response.status).toBe(500);

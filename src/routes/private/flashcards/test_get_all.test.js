@@ -91,7 +91,7 @@ describe('Router Tests ', () => {
 
   beforeEach(async () => {
     await request(app)
-      .post('/flashcard/')
+      .post('/flashcards/')
       .set('Authorization', `Bearer ${authentication_token}`)
       .send(flashcard_payload);
   });
@@ -116,12 +116,12 @@ describe('Router Tests ', () => {
         };
 
         await request(app)
-          .post('/flashcard/')
+          .post('/flashcards/')
           .set('Authorization', `Bearer ${authentication_token}`)
           .send(single_flashcard_payload);
 
         const response = await request(app)
-          .get('/flashcard/')
+          .get('/flashcards/')
           .set('Authorization', `Bearer ${authentication_token}`);
 
         expect(response.status).toBe(200);
@@ -138,7 +138,7 @@ describe('Router Tests ', () => {
 
       it('Should get an array of flashcards', async () => {
         const response = await request(app)
-          .get('/flashcard/')
+          .get('/flashcards/')
           .set('Authorization', `Bearer ${authentication_token}`);
 
         console.log(response.body);
@@ -172,14 +172,14 @@ describe('Router Tests ', () => {
       test('if the authentication token is invalid', async () => {
         const invalid_token = 'invalid_token';
         const response = await request(app)
-          .get('/flashcard/')
+          .get('/flashcards/')
           .set('authorization', `Bearer ${invalid_token}`)
           .expect(401);
         expect(response.body.error).toBe('Token inválido.');
       });
 
       test('if the user is not authenticated', async () => {
-        const response = await request(app).get('/flashcard/').expect(401);
+        const response = await request(app).get('/flashcards/').expect(401);
         expect(response.body.error).toBe('Token não foi enviado.');
       });
     });
@@ -188,7 +188,7 @@ describe('Router Tests ', () => {
       test('if the user has no flashcards', async () => {
         await Flashcard.deleteMany({});
         const response = await request(app)
-          .get('/flashcard/')
+          .get('/flashcards/')
           .set('Authorization', `Bearer ${authentication_token}`)
           .expect(404);
         expect(response.body.error).toBe(messages.noFlashcard);
@@ -201,7 +201,7 @@ describe('Router Tests ', () => {
           throw new Error('Unexpected Error');
         });
         const response = await request(app)
-          .get('/flashcard/')
+          .get('/flashcards/')
           .set('Authorization', `Bearer ${authentication_token}`)
           .expect(500);
         expect(response.body.error).toBe(

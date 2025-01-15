@@ -5,7 +5,7 @@ const chronogram_routes = require('./chronograms');
 const users = require('./users');
 const notices = require('./notices');
 const study_modules = require('./studyModules');
-const flashcardRoutes = require("./flashcard")
+const flashcardRoutes = require("./flashcards")
 
 
 // Private routes
@@ -17,6 +17,6 @@ router.use('/notices', notices);
 
 router.use('/studyModules', study_modules);
 
-router.use("/flashcard", flashcardRoutes);
+router.use("/flashcards", flashcardRoutes);
 
 module.exports = router;
