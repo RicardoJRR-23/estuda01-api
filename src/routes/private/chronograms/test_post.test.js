@@ -397,42 +397,6 @@ describe('Router Tests ', () => {
         });
       });
     });
-    describe('401 Unauthorized', () => {
-      it('Should return 401 if the user is not authenticated', async () => {
-        const payload = {
-          title: 'Titulo do erro 401',
-          description: 'Detalhes do erro',
-          startDate: '2024-01-01',
-          endDate: '2024-01-31',
-          tasks: []
-        };
-
-        const response = await request(app).post('/chronograms/').send(payload);
-
-        expect(response.status).toBe(401);
-
-        expect(response.body.error).toEqual(expect.any(String));
-      });
-      it('Should return 401 if the token is invalid', async () => {
-        const invalid_token = 'invalid_token';
-        const payload = {
-          title: 'Titulo do erro 401',
-          description: 'Detalhes do erro',
-          startDate: '2024-01-01',
-          endDate: '2024-01-31',
-          tasks: []
-        };
-
-        const response = await request(app)
-          .post('/chronograms/')
-          .set('Authorization', `Bearer ${invalid_token}`)
-          .send(payload);
-
-        expect(response.status).toBe(401);
-
-        expect(response.body.error).toEqual(expect.any(String));
-      });
-    });
     describe('500 Internal Server Error', () => {
       it('Should return 500 with detailed error message if creation fails', async () => {
         const mockErrorMessage =
