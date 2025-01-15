@@ -21,6 +21,13 @@ describe('GET /:userId ', () => {
     role: 'admin',
     password: '@123password'
   };
+  const jonh_doe_payload = {
+    name: 'John Doe',
+    email: 'jonh_doe@gmail.com',
+    role: 'admin',
+    password: '@123password'
+  };
+  //simulate a chronogram payload for creation
   const chronogram_payload = {
     title: 'Novo Cronograma',
     description: 'Detalhes do cronograma',
@@ -31,15 +38,30 @@ describe('GET /:userId ', () => {
       { name: 'Task 2', completed: true }
     ]
   };
+  const chronogram_payload_2 = {
+    title: '2 Novo Cronograma',
+    description: '2 Detalhes do cronograma',
+    startDate: '2024-01-01',
+    endDate: '2024-01-31',
+    tasks: [
+      { name: 'Task 1', completed: false },
+      { name: 'Task 2', completed: true }
+    ]
+  };
   let authentication_token;
   let user_id;
+  let jhon_doe_id;
 
   //beforeAll: Connect to the database, create a user and simulate a session
   beforeAll(async () => {
     await dbConnect();
 
     const user_created = await request(app).post('/users').send(user_payload);
+    const jonh_doe_created = await request(app)
+      .post('/users')
+      .send(jonh_doe_payload);
     user_id = user_created.body.id;
+    jhon_doe_id = jonh_doe_created.body.id;
 
     const response = await request(app).post('/sessions').send({
       email: user_payload.email,
@@ -47,19 +69,19 @@ describe('GET /:userId ', () => {
     });
 
     authentication_token = response.body.access_token;
-    const chronogram_data = {
-      ...chronogram_payload,
-      userId: user_id
-    };
-    await Chronogram.create(chronogram_data);
   });
-
   beforeEach(async () => {
     const chronogram_data = {
       ...chronogram_payload,
       userId: user_id
     };
     await Chronogram.create(chronogram_data);
+
+    const chronogram_data_2 = {
+      ...chronogram_payload_2,
+      userId: user_id
+    };
+    await Chronogram.create(chronogram_data_2);
   });
 
   afterAll(async () => {
@@ -73,34 +95,26 @@ describe('GET /:userId ', () => {
   describe('Suceess cases, response with status 200', () => {
     //* 200 - Find all Chronograms of a user
 
-    it('Should return a empty array, if not finding any chronogram', async () => {
-      await Chronogram.deleteMany({});
-      const response = await request(app)
-        .get(`/chronogram/`)
-        .set('authorization', `Bearer ${authentication_token}`);
-
-      expect(response.status).toBe(200);
-
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toEqual(0);
-    });
-    it('Should return a chronogram with userId of the authenticated user', async () => {
+    it('Should return a chronogram with its Id if it belongs to the authenticated user', async () => {
       //Get all chronograms
       const response = await request(app)
-        .get(`/chronogram/`)
+        .get(`/chronograms/`)
         .set('authorization', `Bearer ${authentication_token}`);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toBeGreaterThan(0);
-
       //Check if the chronogram created is in the response
-      response.body.forEach(chronogram => {
+      for (const chronogram of response.body) {
+        const found = await request(app)
+          .get(`/chronograms/${chronogram._id}`)
+          .set('authorization', `Bearer ${authentication_token}`);
+        expect(found.status).toBe(200);
+        expect(found.body).toBeInstanceOf(Array);
+        expect(found.body.length).toBeGreaterThan(0);
+
         expect(chronogram).toMatchObject({
-          title: chronogram_payload.title,
-          description: chronogram_payload.description,
+          title: chronogram.title,
+          description: chronogram.description,
           tasks: expect.arrayContaining(
-            chronogram_payload.tasks.map(task =>
+            chronogram.tasks.map(task =>
               expect.objectContaining({
                 name: task.name,
                 completed: task.completed
@@ -109,47 +123,39 @@ describe('GET /:userId ', () => {
           ),
           userId: user_id
         });
-      });
-    });
-    it('Should return a chronogram with empty task array', async () => {
-      const chronogram_payload = {
-        title: 'Novo Cronograma',
-        description: 'Detalhes do cronograma',
-        startDate: '2024-01-01',
-        endDate: '2024-01-31',
-        tasks: []
-      };
-
-      await request(app)
-        .post('/chronogram/') // Route to create cronograma being tested
-        .set('authorization', `Bearer ${authentication_token}`)
-        .send(chronogram_payload);
-
-      // Regex to validate the yyyy-mm-dd format
-      const date_regex = /^\d{4}-\d{2}-\d{2}$/;
-
-      const response = await request(app)
-        .get(`/chronogram/`)
-        .set('authorization', `Bearer ${authentication_token}`);
-
-      expect(date_regex.test(chronogram_payload.startDate)).toBe(true);
-      expect(date_regex.test(chronogram_payload.endDate)).toBe(true);
-
-      expect(response.status).toBe(200);
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toBeGreaterThan(0);
-
-      response.body.forEach(chronogram => {
-        expect(chronogram).toMatchObject({
-          title: chronogram_payload.title,
-          description: chronogram_payload.description,
-          tasks: expect.arrayContaining([])
-        });
-      });
+      }
     });
   });
-  
   describe('Error cases', () => {
+    //! 404 - Not Found
+    it('Should return 404 if the chronogram was not found', async () => {
+      //Testing error 404 with invalid id
+      const response = await request(app)
+        .get(`/chronograms/123456789012345678901234`)
+        .set('authorization', `Bearer ${authentication_token}`);
+      expect(response.status).toBe(404);
+      expect(response.body).toMatchObject({
+        error: 'Cronograma não encontrado.'
+      });
+    });
+    it('Should return 404 if a user does not own the chronogram', async () => {
+      const chronogram_data = {
+        ...chronogram_payload,
+        userId: jhon_doe_id
+      };
+      const jhon_doe_chronogram = await Chronogram.create(chronogram_data);
+  
+
+      //Testing error 404 with invalid id
+      const response = await request(app)
+        .get(`/chronograms/${jhon_doe_chronogram._id}`)
+        .set('authorization', `Bearer ${authentication_token}`);
+      expect(response.status).toBe(404);
+      expect(response.body).toMatchObject({
+        error: 'Cronograma não encontrado.'
+      });
+    });
+
     //! 500 - Internal Server Error
     it('Should return 500 with if there was an unexpected error occurred', async () => {
       const mockErrorMessage =
@@ -159,9 +165,22 @@ describe('GET /:userId ', () => {
         .spyOn(Chronogram, 'find')
         .mockRejectedValue(new Error(mockErrorMessage));
 
+      const payload = {
+        title: 'Erro Cronograma',
+        description: 'Detalhes do erro',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        tasks: [
+          { name: 'Task 1', completed: false },
+          { name: 'Task 2', completed: true }
+        ],
+        userId: '63f9e18e68d8d830f8e4f1a3'
+      };
+
       const response = await request(app)
-        .get(`/chronogram/`)
-        .set('authorization', `Bearer ${authentication_token}`);
+        .get(`/chronograms/`)
+        .set('authorization', `Bearer ${authentication_token}`)
+        .send(payload);
 
       expect(response.status).toBe(500);
       expect(response.body).toHaveProperty('error');

@@ -74,7 +74,7 @@ describe('Router Tests ', () => {
       const date_regex = /^\d{4}-\d{2}-\d{2}$/;
 
       const response = await request(app)
-        .post('/chronogram/') // Route to create chronogram being tested
+        .post('/chronograms/') // Route to create chronogram being tested
         .set('authorization', `Bearer ${authentication_token}`)
         .send(payload); // Sends the payload as a JSON Object
 
@@ -127,7 +127,7 @@ describe('Router Tests ', () => {
       };
 
       const response = await request(app)
-        .post('/chronogram/')
+        .post('/chronograms/')
         .set('authorization', `Bearer ${authentication_token}`)
         .send(payload);
 
@@ -159,7 +159,7 @@ describe('Router Tests ', () => {
       const date_regex = /^\d{4}-\d{2}-\d{2}$/;
 
       const response = await request(app)
-        .post('/chronogram/')
+        .post('/chronograms/')
         .set('authorization', `Bearer ${authentication_token}`)
         .send(payload);
 
@@ -195,7 +195,7 @@ describe('Router Tests ', () => {
       const date_regex = /^\d{4}-\d{2}-\d{2}$/;
 
       const response = await request(app)
-        .post('/chronogram/')
+        .post('/chronograms/')
         .set('authorization', `Bearer ${authentication_token}`)
         .send(payload);
 
@@ -227,7 +227,7 @@ describe('Router Tests ', () => {
       };
 
       const response = await request(app)
-        .post('/chronogram/')
+        .post('/chronograms/')
         .set('authorization', `Bearer ${authentication_token}`)
         .send(payload);
 

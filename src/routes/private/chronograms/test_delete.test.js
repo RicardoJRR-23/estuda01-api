@@ -105,7 +105,7 @@ describe('GET /:userId ', () => {
   describe('Success cases', () => {
     it('should delete a chronogram', async () => {
       const response = await request(app)
-        .delete(`/chronogram/${chronogram_1_id}`)
+        .delete(`/chronograms/${chronogram_1_id}`)
         .set('Authorization', `Bearer ${authentication_token}`);
       expect(response.status).toBe(200);
 
@@ -124,7 +124,7 @@ describe('GET /:userId ', () => {
   describe('Error cases', () => {
     it('should return 404 if the id provided does not belong to an existing chronogram', async () => {
       const response = await request(app)
-        .delete(`/chronogram/${new mongoose.Types.ObjectId()}`) //! invalid id
+        .delete(`/chronograms/${new mongoose.Types.ObjectId()}`) //! invalid id
         .set('Authorization', `Bearer ${authentication_token}`);
       expect(response.status).toBe(404);
       expect(response.body).toMatchObject({
@@ -134,7 +134,7 @@ describe('GET /:userId ', () => {
 
     it('should return 404 if a user does not own the chronogram', async () => {
       const response = await request(app)
-        .delete(`/chronogram/${chronogram_1_id}`)
+        .delete(`/chronograms/${chronogram_1_id}`)
         .set('Authorization', `Bearer ${jhon_doe_access_token}`); //! different user access token
       expect(response.status).toBe(404);
       expect(response.body).toMatchObject({
@@ -147,7 +147,7 @@ describe('GET /:userId ', () => {
       });
 
       const response = await request(app)
-        .delete(`/chronogram/${chronogram_1_id}`)
+        .delete(`/chronograms/${chronogram_1_id}`)
         .set('Authorization', `Bearer ${authentication_token}`);
 
       expect(response.status).toBe(500);
