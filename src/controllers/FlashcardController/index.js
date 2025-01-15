@@ -1,4 +1,4 @@
-const { Flashcard } = require('../../models');
+const { Flashcard, User } = require('../../models');
 const mongoose = require('mongoose');
 /**
  * @function createOneOrManyController
@@ -262,6 +262,51 @@ const patchController = async (req, res) => {
   }
 };
 
+const deleteController = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+    const user_role = req.user.role;
+    const { flashcardId } = req.params;
+
+    const found = await findByIdService(flashcardId);
+    if (!found) {
+      return res.status(404).json({
+        error: `O Flashcard não foi encontrado.`
+      });
+    }
+   
+
+    const user = await User.findById(user_id);
+    if (!user) {
+      return res.status(404).json({
+        error: `O utilizador nao foi encontrado.`
+      });
+    }
+
+    const IsNotAdmin = user.role !== 'admin' && user_role !== 'admin';
+    const isNotOwner = found.userId.toString() !== user_id;
+    if (user.role !== user_role) {
+      console.log('FALHA GRAVE');
+      return res.status(403).json({
+        error: `O utilizador nao tem permissao para realizar esta operacao.`
+      });
+    }
+    if (IsNotAdmin && isNotOwner) {
+      return res.status(403).json({
+        error: `O flashcard nao pertence ao utilizador.`
+      });
+    } else {
+      const response = await deleteService(flashcardId);
+      return res.status(200).json({message:'Flashcard apagado com sucesso.',response});
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+    });
+  }
+};
+
 //* Services
 
 /**
@@ -370,10 +415,15 @@ async function specificUpdateService(flashcard_id, user_id, flashcard_data) {
   );
 }
 
+async function deleteService(flashcard_id) {
+  return await Flashcard.findByIdAndDelete(flashcard_id);
+}
+
 module.exports = {
   createOneOrManyController,
   findAllController,
   findByIdController,
   putController,
-  patchController
+  patchController,
+  deleteController
 };
