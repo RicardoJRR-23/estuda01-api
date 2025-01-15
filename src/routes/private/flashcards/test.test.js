@@ -83,7 +83,7 @@ describe('Router Tests ', () => {
 
   beforeEach(async () => {
     flashcard_created = await request(app)
-      .post('/flashcard/')
+      .post('/flashcards/')
       .set('Authorization', `Bearer ${authentication_token}`)
       .send(flashcard_payload);
   });
@@ -97,7 +97,7 @@ describe('Router Tests ', () => {
     flashcard_created.length = 0;
   });
 
-  describe('PUT /flashcard/', () => {
+  describe('PUT /flashcards/', () => {
     describe('Error Cases', () => {
       describe('400 - Bad Request', () => {
         describe('Missing Fields', () => {
@@ -108,7 +108,7 @@ describe('Router Tests ', () => {
             };
 
             const response = await request(app)
-              .put(`/flashcard/${flashcard_created.body._id}`)
+              .put(`/flashcards/${flashcard_created.body._id}`)
               .set('Authorization', `Bearer ${authentication_token}`)
               .send(flashcards_update);
 

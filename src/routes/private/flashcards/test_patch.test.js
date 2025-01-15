@@ -83,7 +83,7 @@ describe('Router Tests ', () => {
 
   beforeEach(async () => {
     flashcard_created = await request(app)
-      .post('/flashcard/')
+      .post('/flashcards/')
       .set('Authorization', `Bearer ${authentication_token}`)
       .send(flashcard_payload);
   });
@@ -97,7 +97,7 @@ describe('Router Tests ', () => {
     flashcard_created.length = 0;
   });
 
-  describe('patch /flashcard/', () => {
+  describe('patch /flashcards/', () => {
     describe('Success Cases', () => {
       describe('200 - OK', () => {
         it('should return 200, if the flashcards are updated', async () => {
@@ -108,7 +108,7 @@ describe('Router Tests ', () => {
           };
 
           const response = await request(app)
-            .patch(`/flashcard/${flashcard_created.body._id}`)
+            .patch(`/flashcards/${flashcard_created.body._id}`)
             .set('Authorization', `Bearer ${authentication_token}`)
             .send(flashcards_update);
           expect(response.status).toBe(200);
@@ -118,7 +118,7 @@ describe('Router Tests ', () => {
         });
         it('should update the flashcards, if there is no subject', async () => {
           const flashcard_no_subject_created = await request(app)
-            .post('/flashcard/')
+            .post('/flashcards/')
             .set('Authorization', `Bearer ${authentication_token}`)
             .send(flashcard_no_subject_payload);
 
@@ -128,7 +128,7 @@ describe('Router Tests ', () => {
           };
 
           const response = await request(app)
-            .patch(`/flashcard/${flashcard_no_subject_created.body._id}`)
+            .patch(`/flashcards/${flashcard_no_subject_created.body._id}`)
             .set('Authorization', `Bearer ${authentication_token}`)
             .send(flashcards_update);
 
@@ -143,7 +143,7 @@ describe('Router Tests ', () => {
             };
 
             const response = await request(app)
-              .patch(`/flashcard/${flashcard_created.body._id}`)
+              .patch(`/flashcards/${flashcard_created.body._id}`)
               .set('Authorization', `Bearer ${authentication_token}`)
               .send(flashcards_update);
 
@@ -156,7 +156,7 @@ describe('Router Tests ', () => {
             };
 
             const response = await request(app)
-              .patch(`/flashcard/${flashcard_created.body._id}`)
+              .patch(`/flashcards/${flashcard_created.body._id}`)
               .set('Authorization', `Bearer ${authentication_token}`)
               .send(flashcards_update);
 
@@ -169,7 +169,7 @@ describe('Router Tests ', () => {
             };
 
             const response = await request(app)
-              .patch(`/flashcard/${flashcard_created.body._id}`)
+              .patch(`/flashcards/${flashcard_created.body._id}`)
               .set('Authorization', `Bearer ${authentication_token}`)
               .send(flashcards_update);
 
@@ -193,7 +193,7 @@ describe('Router Tests ', () => {
                 subject: 'Math'
               };
               const response = await request(app)
-                .patch(`/flashcard/${flashcard_created.body._id}`)
+                .patch(`/flashcards/${flashcard_created.body._id}`)
                 .set('Authorization', `Bearer ${authentication_token}`)
                 .send(invalid_payload_update);
 
@@ -215,7 +215,7 @@ describe('Router Tests ', () => {
               };
 
               const response = await request(app)
-                .patch(`/flashcard/${flashcard_created.body._id}`)
+                .patch(`/flashcards/${flashcard_created.body._id}`)
                 .set('Authorization', `Bearer ${authentication_token}`)
                 .send(invalid_payload_update);
 
@@ -229,7 +229,7 @@ describe('Router Tests ', () => {
           it('should return 400 if is send an empty object', async () => {
             const empty_payload = {};
             const response = await request(app)
-              .patch(`/flashcard/${flashcard_created.body._id}`)
+              .patch(`/flashcards/${flashcard_created.body._id}`)
               .set('Authorization', `Bearer ${authentication_token}`)
               .send(empty_payload);
             expect(response.status).toBe(400);
@@ -240,7 +240,7 @@ describe('Router Tests ', () => {
       describe('401 - Unauthorized', () => {
         it('should return 401 if the user is not authenticated', async () => {
           const response = await request(app)
-            .patch(`/flashcard/${flashcard_created.body._id}`)
+            .patch(`/flashcards/${flashcard_created.body._id}`)
             .send(flashcard_payload);
           expect(response.status).toBe(401);
           expect(response.body.error).toBe('Token não foi enviado.');
@@ -248,7 +248,7 @@ describe('Router Tests ', () => {
         it('should return 401 if the user is not authorized', async () => {
           const invalid_token = 'invalid_token';
           const response = await request(app)
-            .patch(`/flashcard/${flashcard_created.body._id}`)
+            .patch(`/flashcards/${flashcard_created.body._id}`)
             .set('Authorization', `Bearer ${invalid_token}`)
             .send(flashcard_payload);
           expect(response.status).toBe(401);
@@ -264,7 +264,7 @@ describe('Router Tests ', () => {
           };
 
           const response = await request(app)
-            .patch(`/flashcard/098765432167890543215678`)
+            .patch(`/flashcards/098765432167890543215678`)
             .set('Authorization', `Bearer ${authentication_token}`)
             .send(flashcards_update);
           expect(response.status).toBe(404);
@@ -279,7 +279,7 @@ describe('Router Tests ', () => {
           };
 
           const response = await request(app)
-            .patch(`/flashcard/${flashcard_created.body._id}`)
+            .patch(`/flashcards/${flashcard_created.body._id}`)
             .set('authorization', `Bearer ${jhon_doe_access_token}`)
             .send(flashcards_update);
           expect(response.status).toBe(404);
@@ -290,7 +290,7 @@ describe('Router Tests ', () => {
           jest.spyOn(Flashcard, 'findOneAndUpdate').mockImplementation(() => {
             throw new Error('Unexpected Error');
           });
-          // Mock of the model return (see example in the file'src/models/Flashcard/index.js')
+          // Mock of the model return (see example in the file'src/models/Flashcards/index.js')
 
           const flashcards_update = {
             question: 'Updated question ',
@@ -298,7 +298,7 @@ describe('Router Tests ', () => {
             subject: 'updated subject'
           };
           const response = await request(app)
-            .patch(`/flashcard/${flashcard_created.body._id}`)
+            .patch(`/flashcards/${flashcard_created.body._id}`)
             .set('Authorization', `Bearer ${authentication_token}`)
             .send(flashcards_update);
 

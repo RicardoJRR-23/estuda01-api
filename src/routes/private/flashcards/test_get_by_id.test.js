@@ -9,7 +9,7 @@ const {
   dbDisconnect
 } = require('../../../__helpers__/mongodbServer/index.js');
 
-describe('GET /flashcard/:flashcardId  ', () => {
+describe('GET /flashcards/:flashcardId  ', () => {
   //Pre-requisites: User register and session simulation
   // 'src/routes/public/users/index.js'
   // 'src/routes/public/sessions/index.js'
@@ -79,7 +79,7 @@ describe('GET /flashcard/:flashcardId  ', () => {
 
   beforeEach(async () => {
     const response = await request(app)
-      .post('/flashcard/')
+      .post('/flashcards/')
       .set('Authorization', `Bearer ${authentication_token}`)
       .send(flashcard_payload);
 
@@ -100,7 +100,7 @@ describe('GET /flashcard/:flashcardId  ', () => {
     it('Should return the correct structure for a valid flashcard', async () => {
       //Get the flashcard
       const response = await request(app)
-        .get(`/flashcard/${flashcard_id}`)
+        .get(`/flashcards/${flashcard_id}`)
         .set('authorization', `Bearer ${authentication_token}`);
 
       expect(response.status).toBe(200);
@@ -120,13 +120,13 @@ describe('GET /flashcard/:flashcardId  ', () => {
         answer: 'Yes, it is.'
       };
       const flashcard = await request(app)
-        .post('/flashcard/') // Route to create cronograma being tested
+        .post('/flashcards/') // Route to create cronograma being tested
         .set('authorization', `Bearer ${authentication_token}`)
         .send(flashcard_payload);
 
       //Get the flashcard
       const response = await request(app)
-        .get(`/flashcard/${flashcard.body._id}`)
+        .get(`/flashcards/${flashcard.body._id}`)
         .set('authorization', `Bearer ${authentication_token}`);
 
       expect(response.status).toBe(200);
@@ -137,7 +137,7 @@ describe('GET /flashcard/:flashcardId  ', () => {
     it('Should return the flashcard, but does not belong to user', async () => {
       //Get the flashcard
       const response = await request(app)
-        .get(`/flashcard/${flashcard_id}`)
+        .get(`/flashcards/${flashcard_id}`)
         .set('authorization', `Bearer ${jhon_doe_access_token}`);
 
       expect(response.status).toBe(200);
@@ -168,7 +168,7 @@ describe('GET /flashcard/:flashcardId  ', () => {
 
         for (let i = 0; i < invalid_id.length; i++) {
           const response = await request(app)
-            .get(`/flashcard/${invalid_id[i]}`)
+            .get(`/flashcards/${invalid_id[i]}`)
             .set('authorization', `Bearer ${authentication_token}`);
 
           expect(response.status).toBe(400);
@@ -181,7 +181,7 @@ describe('GET /flashcard/:flashcardId  ', () => {
       it('Should return 401 if the authentication token is invalid', async () => {
         const invalid_token = 'invalid_token';
         const response = await request(app)
-          .get(`/flashcard/${flashcard_id}`)
+          .get(`/flashcards/${flashcard_id}`)
           .set('authorization', `Bearer ${invalid_token}`)
           .expect(401);
         expect(response.body.error).toBe(messages.tokenInvalid);
@@ -189,7 +189,7 @@ describe('GET /flashcard/:flashcardId  ', () => {
 
       it('Should return 401 if the user is not authenticated', async () => {
         const response = await request(app)
-          .get(`/flashcard/${flashcard_id}`)
+          .get(`/flashcards/${flashcard_id}`)
           .expect(401);
         expect(response.body.error).toBe('Token não foi enviado.');
       });
@@ -197,7 +197,7 @@ describe('GET /flashcard/:flashcardId  ', () => {
     describe('404 - Not Found', () => {
       it('Should return 404 if, the flaschard was Not Found', async () => {
         const response = await request(app)
-          .get(`/flashcard/123456789012345678901234`) //Inexistend flashcard id
+          .get(`/flashcards/123456789012345678901234`) //Inexistend flashcard id
           .set('authorization', `Bearer ${authentication_token}`);
 
         expect(response.status).toBe(404);
@@ -214,7 +214,7 @@ describe('GET /flashcard/:flashcardId  ', () => {
           .mockRejectedValue(new Error(mockErrorMessage));
 
         const response = await request(app)
-          .get(`/flashcard/${flashcard_id}`)
+          .get(`/flashcards/${flashcard_id}`)
           .set('authorization', `Bearer ${authentication_token}`);
 
         expect(response.status).toBe(500);
