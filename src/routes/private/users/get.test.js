@@ -31,7 +31,7 @@ describe('GET /users/:userId', () => {
     authentication_token = response.body.access_token;
 
     expected_user_payload = {
-      id: user_id,
+      _id: user_id,
       ...user_payload
     };
     delete expected_user_payload.password;
