@@ -17,6 +17,6 @@ router.use('/notices', notices);
 
 router.use('/studyModules', study_modules);
 
-router.use("/flashcard", flashcardRoutes);
+router.use("/flashcards", flashcardRoutes);
 
 module.exports = router;

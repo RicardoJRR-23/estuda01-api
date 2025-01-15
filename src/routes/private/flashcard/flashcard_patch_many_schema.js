@@ -19,8 +19,12 @@ const flashcardSchema = Joi.object({
 })
   .messages({
     'object.base':
-      'Os campos obrigatórios são: question e answer; Opcional: subject.'
+
+      'Os campos obrigatórios são: question e answer; Opcional: subject.',
+    'object.missing':
+      'Pelo menos um dos campos "question", "answer" ou "subject" deve ser preenchido.'
   })
+  .or('question', 'answer', 'subject')
   .unknown(false)
   .error(errors => {
     return errors.map(error => {

@@ -121,11 +121,14 @@ describe('Router Tests ', () => {
             .post('/flashcard/')
             .set('Authorization', `Bearer ${authentication_token}`)
             .send(flashcard_no_subject_payload);
+
           const flashcards_update = {
             question: 'Updated question ',
             answer: 'updated answer'
           };
-          console.log('should update the flashcards, if there is no subject');
+
+
+
           const response = await request(app)
             .patch(`/flashcard/${flashcard_no_subject_created.body._id}`)
             .set('Authorization', `Bearer ${authentication_token}`)
@@ -147,10 +150,7 @@ describe('Router Tests ', () => {
               .send(flashcards_update);
 
             expect(response.status).toBe(200);
-            console.log(
-              '🚀 ~ it ~ Should return 200 if question is missing:',
-              response.body
-            );
+
           });
           it('Should return 200 if answer is missing', async () => {
             const flashcards_update = {
@@ -164,10 +164,7 @@ describe('Router Tests ', () => {
               .send(flashcards_update);
 
             expect(response.status).toBe(200);
-            console.log(
-              '🚀 ~ it ~ Should return 200 if answer is missing:',
-              response.body
-            );
+
           });
           it('Should return 200 if subject is missing', async () => {
             const flashcards_update = {
@@ -181,10 +178,7 @@ describe('Router Tests ', () => {
               .send(flashcards_update);
 
             expect(response.status).toBe(200);
-            console.info(
-              '🚀 ~ it ~ Should return 200 if subject is missing:',
-              response.body
-            );
+
           });
         });
       });
@@ -194,7 +188,7 @@ describe('Router Tests ', () => {
       describe('400 - Bad Request', () => {
         describe('Unexpected Field Values', () => {
           it('should return 400 if different Flashcards have an invalid playload', async () => {
-            // Invalid values ​​for fields question and answer
+            // Invalid values for fields question and answer
             const invalidQuestions = [[], {}, null];
             const invalidAnswers = [[], {}, null];
             for (let i = 0; i < invalidQuestions.length; i++) {
@@ -236,6 +230,18 @@ describe('Router Tests ', () => {
               console.error(normalize(response.body.error));
             }
           });
+
+
+          it('should return 400 if is send an empty object', async () => {
+            const empty_payload = {};
+            const response = await request(app)
+              .patch(`/flashcard/${flashcard_created.body._id}`)
+              .set('Authorization', `Bearer ${authentication_token}`)
+              .send(empty_payload);
+            expect(response.status).toBe(400);
+            console.error(response.body.error);
+          });
+
         });
       });
       describe('401 - Unauthorized', () => {
@@ -272,7 +278,9 @@ describe('Router Tests ', () => {
           expect(response.body.error).toBe(messages.flashcardNotFound);
         });
 
-        it('Should return 404 if the chronogram id is found but does not belong to the authenticated user', async () => {
+
+        it('Should return 404 if the flashcard id is found but does not belong to the authenticated user', async () => {
+
           const flashcards_update = {
             question: 'Updated question ',
             answer: 'updated answer',
@@ -288,7 +296,9 @@ describe('Router Tests ', () => {
       });
       describe('500 - Internal Server Error', () => {
         it('should return 500 if an internal server error occurs', async () => {
-          jest.spyOn(Flashcard, 'findByIdAndUpdate').mockImplementation(() => {
+
+          jest.spyOn(Flashcard, 'findOneAndUpdate').mockImplementation(() => {
+
             throw new Error('Unexpected Error');
           });
           // Mock of the model return (see example in the file'src/models/Flashcard/index.js')

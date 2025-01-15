@@ -148,10 +148,7 @@ describe('Router Tests ', () => {
 
             expect(response.status).toBe(200);
             expect(response.body.subject).toBe(null);
-            console.log(
-              '🚀 ~ it ~ Should return 200 if subject is missing:',
-              response.body
-            );
+
           });
         });
       });
@@ -270,7 +267,9 @@ describe('Router Tests ', () => {
           expect(response.body.error).toBe(messages.flashcardNotFound);
         });
 
-        it('Should return 404 if the chronogram id is found but does not belong to the authenticated user', async () => {
+
+        it('Should return 404 if the flashcard id is found but does not belong to the authenticated user', async () => {
+
           const flashcards_update = {
             question: 'Updated question ',
             answer: 'updated answer',
@@ -286,7 +285,7 @@ describe('Router Tests ', () => {
       });
       describe('500 - Internal Server Error', () => {
         it('should return 500 if an internal server error occurs', async () => {
-          jest.spyOn(Flashcard, 'findByIdAndUpdate').mockImplementation(() => {
+          jest.spyOn(Flashcard, 'findOneAndUpdate').mockImplementation(() => {
             throw new Error('Unexpected Error');
           });
           // Mock of the model return (see example in the file'src/models/Flashcard/index.js')
