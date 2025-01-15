@@ -417,6 +417,7 @@ async function specificUpdateService(flashcard_id, user_id, flashcard_data) {
 
 async function deleteService(flashcard_id) {
   return await Flashcard.findByIdAndDelete(flashcard_id);
+
 }
 
 module.exports = {

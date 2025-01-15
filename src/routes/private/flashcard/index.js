@@ -420,6 +420,7 @@ router.patch(
   patchController
 );
 
+
 /**
  * @swagger
  * /flashcard/{flashcardId}:
@@ -470,5 +471,6 @@ router.patch(
  *                    'Ocorreu um erro inesperado. Tente novamente mais tarde.'
  */
 router.delete('/:flashcardId', deleteController);
+
 
 module.exports = router;
