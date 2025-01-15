@@ -59,10 +59,6 @@ const registerUser = async (req, res) => {
 /**
  * Handles the retrieval of a user's information.
  * 
- * This function checks if the user ID from the request matches either "me" or the ID
- * of the currently authenticated user. If it doesn't match, a 403 Forbidden response 
- * is returned. On success, the user's data is returned.
- *
  * @async
  * @function getUser
  * @param {Object} req - The request object from Express.js, containing:
@@ -73,25 +69,111 @@ const registerUser = async (req, res) => {
  */
 const getUser = async (req, res) => {
   try {
-    // Extract the requested user ID from the route parameters.
-    const user_id = req.params.userId;
+    const user = await User.findById(req.user.id);
 
-    // Validate if the requested user ID is either "me" or matches the authenticated user's ID.
-    // If it doesn't match, return a 403 Forbidden response with an error message.
-    if (user_id !== 'me' && user_id !== req.user.id) {
-      return res.status(403).json({
-        error: 'O id do usuário ou é inválido ou não corresponde ao usuário autenticado.',
-      });
+    return res.status(200).json({
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (error) {
+    // Log any unexpected errors to the server console for debugging purposes.
+    console.error('Unexpected Error: ', error);
+
+    // Respond with a 500 Internal Server Error and a generic error message.
+    return res.status(500).json({
+      error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.',
+    });
+  }
+};
+
+/**
+ * Handles the update process of a user's name and email
+ *
+ * @async
+ * @function updateUser
+ * @param {Object} req - The request object from Express.js, containing:
+ *    - `params.userId`: The ID of the user requested (e.g., "me" or a specific ID).
+ *    - `user`: The authenticated user's information.
+ *    - `body`: The user email and name to update
+ * @param {Object} res - The response object from Express.js used to send HTTP responses.
+ * @returns {Object} a status code 204 indicating the success of the update process
+ */
+const updateUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const payload = req.body;
+
+    const user = await User.findOne({ email: payload.email });
+
+    if (user && user._id.toString() !== userId) {
+      return res
+        .status(400)
+        .json({
+          error: 'Este email não pode ser registrado para este usuário.'
+        });
     }
 
-    // If the validation passes, send back the user's information.
-    return res.status(200).json({
-      id: req.user.id,
-      name: req.user.name,
-      email: req.user.email,
-      role: req.user.role,
-    });
+    await User.updateOne({ _id: userId }, { $set: payload });
 
+    return res.status(204).send()
+  } catch (error) {
+    // Log any unexpected errors to the server console for debugging purposes.
+    console.error('Unexpected Error: ', error);
+
+    // Respond with a 500 Internal Server Error and a generic error message.
+    return res.status(500).json({
+      error: 'Ocorreu um erro inesperado. Tente novamente mais tarde.',
+    });
+  }
+};
+
+/**
+ * Handles the update process of a user's password
+ *
+ * @async
+ * @function updateUserPassword
+ * @param {Object} req - The request object from Express.js, containing:
+ *    - `params.userId`: The ID of the user requested (e.g., "me" or a specific ID).
+ *    - `user`: The authenticated user's information.
+ *    - `body`: The user password to updated and the currentPassword to match the stored one
+ * @param {Object} res - The response object from Express.js used to send HTTP responses.
+ * @returns {Object} a status code 204 indicating the success of the update process
+ */
+const updateUserPassword = async (req, res) => {
+  try {
+    const payload = req.body;
+
+    const user = await User.findById(req.user.id);
+
+    // Compare the provided password with the hashed password in the database
+    const does_passwords_match = await passwordEncryption.compare(
+      payload.currentPassword,
+      user.password
+    );
+
+    // If passwords do not match, send unauthorized response
+    if (!does_passwords_match) {
+      return res
+        .status(400)
+        .json({
+          error: 'Campo "currentPassword" não corresponde ao password armazenado.'
+        });
+    }
+
+    const password_encrypted = await passwordEncryption.encrypt(payload.password);
+
+    await User.updateOne(
+      { _id: user._id },
+      { 
+        $set: {
+          password: password_encrypted
+        } 
+      }
+    );
+
+    return res.status(204).send()
   } catch (error) {
     // Log any unexpected errors to the server console for debugging purposes.
     console.error('Unexpected Error: ', error);
@@ -105,5 +187,7 @@ const getUser = async (req, res) => {
 
 module.exports = {
   registerUser,
-  getUser
+  getUser,
+  updateUser,
+  updateUserPassword
 }
