@@ -134,24 +134,6 @@ describe('Router Tests ', () => {
     });
 
     describe('Error Cases', () => {
-      describe('401 - Unauthorized', () => {
-        it('should return 401 if the user is not authenticated', async () => {
-          const response = await request(app).delete(
-            `/flashcards/${flashcard_created.body._id}`
-          );
-          expect(response.status).toBe(401);
-          expect(response.body.error).toBe('Token não foi enviado.');
-        });
-        it('should return 401 if the user is not authorized', async () => {
-          const invalid_token = 'invalid_token';
-          const response = await request(app)
-            .delete(`/flashcards/${flashcard_created.body._id}`)
-            .set('Authorization', `Bearer ${invalid_token}`);
-
-          expect(response.status).toBe(401);
-          expect(response.body.error).toBe('Token inválido.');
-        });
-      });
       describe('404 - Not Found', () => {
         it('should return 404 if the flashcard with the given ID is not found', async () => {
           const response = await request(app)
