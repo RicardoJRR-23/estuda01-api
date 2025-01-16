@@ -63,12 +63,12 @@ describe('Router Tests ', () => {
     await dbDisconnect();
   });
 
-  describe('POST /flashcard/', () => {
+  describe('POST /flashcards/', () => {
     describe('Success Cases', () => {
       describe('For Array', () => {
         it('should create a new flashcard', async () => {
           const response = await request(app)
-            .post('/flashcard/')
+            .post('/flashcards/')
             .set('Authorization', `Bearer ${authentication_token}`)
             .send(flashcard_payload);
 
@@ -110,7 +110,7 @@ describe('Router Tests ', () => {
           ];
 
           const response = await request(app)
-            .post('/flashcard/')
+            .post('/flashcards/')
             .set('authorization', `Bearer ${authentication_token}`)
             .send(payload_without_subject);
 
@@ -128,7 +128,7 @@ describe('Router Tests ', () => {
       describe('For Object', () => {
         it('should create a new flashcard', async () => {
           const response = await request(app)
-            .post('/flashcard/')
+            .post('/flashcards/')
             .set('Authorization', `Bearer ${authentication_token}`)
             .send(flashcard_payload[0]);
 
@@ -151,7 +151,7 @@ describe('Router Tests ', () => {
           };
 
           const response = await request(app)
-            .post('/flashcard/')
+            .post('/flashcards/')
             .set('authorization', `Bearer ${authentication_token}`)
             .send(payload_without_subject);
 
@@ -171,7 +171,7 @@ describe('Router Tests ', () => {
           const empty_array = [];
 
           const response = await request(app)
-            .post('/flashcard/')
+            .post('/flashcards/')
             .set('authorization', `Bearer ${authentication_token}`)
             .send(empty_array);
 
@@ -191,7 +191,7 @@ describe('Router Tests ', () => {
           ];
 
           const response = await request(app)
-            .post('/flashcard/')
+            .post('/flashcards/')
             .set('authorization', `Bearer ${authentication_token}`)
             .send(invalid_array_playload);
 
@@ -222,7 +222,7 @@ describe('Router Tests ', () => {
               ];
 
               const response = await request(app)
-                .post('/flashcard/')
+                .post('/flashcards/')
                 .set('authorization', `Bearer ${authentication_token}`)
                 .send(invalid_payload);
 
@@ -251,7 +251,7 @@ describe('Router Tests ', () => {
               ];
 
               const response = await request(app)
-                .post('/flashcard/')
+                .post('/flashcards/')
                 .set('authorization', `Bearer ${authentication_token}`)
                 .send(invalid_payload);
 
@@ -281,7 +281,7 @@ describe('Router Tests ', () => {
               ];
 
               const response = await request(app)
-                .post('/flashcard/')
+                .post('/flashcards/')
                 .set('authorization', `Bearer ${authentication_token}`)
                 .send(invalid_payload);
 
@@ -305,7 +305,7 @@ describe('Router Tests ', () => {
               ];
 
               const response = await request(app)
-                .post('/flashcard/')
+                .post('/flashcards/')
                 .set('authorization', `Bearer ${authentication_token}`)
                 .send(invalid_payload);
 
@@ -328,7 +328,7 @@ describe('Router Tests ', () => {
               };
 
               const response = await request(app)
-                .post('/flashcard/')
+                .post('/flashcards/')
                 .set('authorization', `Bearer ${authentication_token}`)
                 .send(invalid_payload);
 
@@ -350,7 +350,7 @@ describe('Router Tests ', () => {
               };
 
               const response = await request(app)
-                .post('/flashcard/')
+                .post('/flashcards/')
                 .set('authorization', `Bearer ${authentication_token}`)
                 .send(invalid_payload);
 
@@ -372,7 +372,7 @@ describe('Router Tests ', () => {
               };
 
               const response = await request(app)
-                .post('/flashcard/')
+                .post('/flashcards/')
                 .set('authorization', `Bearer ${authentication_token}`)
                 .send(invalid_payload);
 
@@ -394,7 +394,7 @@ describe('Router Tests ', () => {
                 subject: 'Philosophy'
               };
               const response = await request(app)
-                .post('/flashcard/')
+                .post('/flashcards/')
                 .set('authorization', `Bearer ${authentication_token}`)
                 .send(invalid_payload);
 
@@ -416,7 +416,7 @@ describe('Router Tests ', () => {
               };
 
               const response = await request(app)
-                .post('/flashcard/')
+                .post('/flashcards/')
                 .set('authorization', `Bearer ${authentication_token}`)
                 .send(invalid_payload);
 
@@ -442,7 +442,7 @@ describe('Router Tests ', () => {
             ];
 
             const response = await request(app)
-              .post('/flashcard/')
+              .post('/flashcards/')
               .set('authorization', `Bearer ${authentication_token}`)
               .send(payload_missing_question);
 
@@ -463,7 +463,7 @@ describe('Router Tests ', () => {
             ];
 
             const response = await request(app)
-              .post('/flashcard/')
+              .post('/flashcards/')
               .set('authorization', `Bearer ${authentication_token}`)
               .send(payload_missing_question);
 
@@ -483,7 +483,7 @@ describe('Router Tests ', () => {
             ];
 
             const response = await request(app)
-              .post('/flashcard/')
+              .post('/flashcards/')
               .set('authorization', `Bearer ${authentication_token}`)
               .send(payload_missing_question);
 
@@ -504,7 +504,7 @@ describe('Router Tests ', () => {
             };
 
             const response = await request(app)
-              .post('/flashcard/')
+              .post('/flashcards/')
               .set('authorization', `Bearer ${authentication_token}`)
               .send(payload_missing_question);
 
@@ -523,7 +523,7 @@ describe('Router Tests ', () => {
             };
 
             const response = await request(app)
-              .post('/flashcard/')
+              .post('/flashcards/')
               .set('authorization', `Bearer ${authentication_token}`)
               .send(payload_missing_question);
 
@@ -539,7 +539,7 @@ describe('Router Tests ', () => {
             const payload_missing_question = { subject: 'Philosophy' };
 
             const response = await request(app)
-              .post('/flashcard/')
+              .post('/flashcards/')
               .set('authorization', `Bearer ${authentication_token}`)
               .send(payload_missing_question);
 
@@ -556,7 +556,7 @@ describe('Router Tests ', () => {
     describe('Error cases, response with status 401', () => {
       it('should return 401 if the user is not authenticated', async () => {
         const response = await request(app)
-          .post('/flashcard/')
+          .post('/flashcards/')
           .send([
             {
               question: 'Is this real life?',
@@ -571,7 +571,7 @@ describe('Router Tests ', () => {
       it('should return 401 if the authentication token is invalid', async () => {
         const invalid_token = 'invalid_token';
         const response = await request(app)
-          .post('/flashcard/')
+          .post('/flashcards/')
           .set('authorization', `Bearer ${invalid_token}`)
           .send(flashcard_payload);
         expect(response.status).toBe(401);
@@ -584,10 +584,10 @@ describe('Router Tests ', () => {
         jest.spyOn(Flashcard, 'insertMany').mockImplementation(() => {
           throw new Error('Unexpected Error');
         });
-        // Mock of the model return (see example in the file'src/models/Flashcard/index.js')
+        // Mock of the model return (see example in the file'src/models/Flashcards/index.js')
 
         const response = await request(app)
-          .post('/flashcard/')
+          .post('/flashcards/')
           .set('authorization', `Bearer ${authentication_token}`)
           .send(flashcard_payload);
 
