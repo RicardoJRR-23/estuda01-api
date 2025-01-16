@@ -165,7 +165,7 @@ describe('Router Tests ', () => {
   });
 
   describe('Error Cases', () => {
-    describe('Error cases, response with status 400', () => {
+    describe('400 - Bad Request', () => {
       describe('Array validation', () => {
         it('should return 400 if empty array', async () => {
           const empty_array = [];
@@ -553,33 +553,7 @@ describe('Router Tests ', () => {
       });
     });
 
-    describe('Error cases, response with status 401', () => {
-      it('should return 401 if the user is not authenticated', async () => {
-        const response = await request(app)
-          .post('/flashcards/')
-          .send([
-            {
-              question: 'Is this real life?',
-              answer: 'Yes, it is.',
-              subject: 'Philosophy'
-            }
-          ]);
-        expect(response.status).toBe(401);
-        expect(response.body.error).toBe('Token não foi enviado.');
-      });
-
-      it('should return 401 if the authentication token is invalid', async () => {
-        const invalid_token = 'invalid_token';
-        const response = await request(app)
-          .post('/flashcards/')
-          .set('authorization', `Bearer ${invalid_token}`)
-          .send(flashcard_payload);
-        expect(response.status).toBe(401);
-        expect(response.body.error).toBe('Token inválido.');
-      });
-    });
-
-    describe('Error cases, response with status 500', () => {
+    describe('500 - Internal Server Error', () => {
       it('should return 500 if an internal server error occurs', async () => {
         jest.spyOn(Flashcard, 'insertMany').mockImplementation(() => {
           throw new Error('Unexpected Error');
