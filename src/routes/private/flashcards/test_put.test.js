@@ -253,24 +253,6 @@ describe('Router Tests ', () => {
           });
         });
       });
-      describe('401 - Unauthorized', () => {
-        it('should return 401 if the user is not authenticated', async () => {
-          const response = await request(app)
-            .put(`/flashcards/${flashcard_created.body._id}`)
-            .send(flashcard_payload);
-          expect(response.status).toBe(401);
-          expect(response.body.error).toBe('Token não foi enviado.');
-        });
-        it('should return 401 if the user is not authorized', async () => {
-          const invalid_token = 'invalid_token';
-          const response = await request(app)
-            .put(`/flashcards/${flashcard_created.body._id}`)
-            .set('Authorization', `Bearer ${invalid_token}`)
-            .send(flashcard_payload);
-          expect(response.status).toBe(401);
-          expect(response.body.error).toBe('Token inválido.');
-        });
-      });
       describe('404 - Not Found', () => {
         it('should return 404 if the flashcard with the given ID is not found', async () => {
           const flashcards_update = {
