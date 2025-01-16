@@ -8,7 +8,7 @@ const {
   dbDisconnect
 } = require('../../../__helpers__/mongodbServer/index.js');
 
-describe('PUT /chronogram/:chronogram_id', () => {
+describe('patch /chronograms/:chronogram_id', () => {
   const user_payload = {
     name: 'Ricardo Rosário',
     email: 'ricardo@gmail.com',
@@ -111,7 +111,7 @@ describe('PUT /chronogram/:chronogram_id', () => {
       //update the chronogram
 
       const response = await request(app)
-        .put(`/chronogram/${chronogram_id}`)
+        .patch(`/chronograms/${chronogram_id}`)
         .set('authorization', `Bearer ${access_token}`)
         .send(update_payload);
 
@@ -141,7 +141,7 @@ describe('PUT /chronogram/:chronogram_id', () => {
       };
       //update the chronogram
       const response = await request(app)
-        .put(`/chronogram/${chronogram_id}`)
+        .patch(`/chronograms/${chronogram_id}`)
         .set('authorization', `Bearer ${access_token}`)
         .send(payloads_without_description_and_tasks);
 
@@ -174,7 +174,7 @@ describe('PUT /chronogram/:chronogram_id', () => {
 
     it('Should return 404 if the chronogram id is not found', async () => {
       const response = await request(app)
-        .put('/chronogram/63f9e18e68d8d830f8e4f1a3') // Invalid chronogram id
+        .patch('/chronograms/63f9e18e68d8d830f8e4f1a3') // Invalid chronogram id
         .set('authorization', `Bearer ${access_token}`)
         .send(update_payload);
       expect(response.status).toBe(404);
@@ -184,7 +184,7 @@ describe('PUT /chronogram/:chronogram_id', () => {
 
     it('Should return 404 if the chronogram id is found but does not belong to the authenticated user', async () => {
       const response = await request(app)
-        .put(`/chronogram/${chronogram_id}`)
+        .patch(`/chronograms/${chronogram_id}`)
         .set('authorization', `Bearer ${jhon_doe_access_token}`) //
         .send(update_payload);
       expect(response.status).toBe(404);
@@ -209,7 +209,7 @@ describe('PUT /chronogram/:chronogram_id', () => {
             ]
           };
           const response = await request(app)
-            .put(`/chronogram/${chronogram_id}`)
+            .patch(`/chronograms/${chronogram_id}`)
             .set('authorization', `Bearer ${access_token}`)
             .send(invalid_payload);
           expect(response.status).toBe(400);
@@ -229,7 +229,7 @@ describe('PUT /chronogram/:chronogram_id', () => {
             ]
           };
           const response = await request(app)
-            .put(`/chronogram/${chronogram_id}`)
+            .patch(`/chronograms/${chronogram_id}`)
             .set('authorization', `Bearer ${access_token}`)
             .send(invalid_payload);
           expect(response.status).toBe(400);
@@ -262,7 +262,7 @@ describe('PUT /chronogram/:chronogram_id', () => {
               ]
             };
             const response = await request(app)
-              .put(`/chronogram/${chronogram_id}`)
+              .patch(`/chronograms/${chronogram_id}`)
               .set('authorization', `Bearer ${access_token}`)
               .send(invalid_payload);
             expect(response.status).toBe(400);
@@ -292,7 +292,7 @@ describe('PUT /chronogram/:chronogram_id', () => {
               ]
             };
             const response = await request(app)
-              .put(`/chronogram/${chronogram_id}`)
+              .patch(`/chronograms/${chronogram_id}`)
               .set('authorization', `Bearer ${access_token}`)
               .send(invalid_payload);
             expect(response.status).toBe(400);
@@ -316,7 +316,7 @@ describe('PUT /chronogram/:chronogram_id', () => {
           expect(date_regex.test(invalid_payload.endDate)).toBe(true);
 
           const response = await request(app)
-            .put(`/chronogram/${chronogram_id}`)
+            .patch(`/chronograms/${chronogram_id}`)
             .set('authorization', `Bearer ${access_token}`)
             .send(invalid_payload);
           expect(response.status).toBe(400);
@@ -339,7 +339,7 @@ describe('PUT /chronogram/:chronogram_id', () => {
           expect(date_regex.test(invalid_payload.endDate)).toBe(false);
 
           const response = await request(app)
-            .put(`/chronogram/${chronogram_id}`)
+            .patch(`/chronograms/${chronogram_id}`)
             .set('authorization', `Bearer ${access_token}`)
             .send(invalid_payload);
           expect(response.status).toBe(400);
@@ -361,7 +361,7 @@ describe('PUT /chronogram/:chronogram_id', () => {
             ]
           };
           const response = await request(app)
-            .put(`/chronogram/${chronogram_id}`)
+            .patch(`/chronograms/${chronogram_id}`)
             .set('authorization', `Bearer ${access_token}`)
             .send(invalid_payload);
           expect(response.status).toBe(400);
@@ -383,72 +383,11 @@ describe('PUT /chronogram/:chronogram_id', () => {
             ]
           };
           const response = await request(app)
-            .put(`/chronogram/${chronogram_id}`)
+            .patch(`/chronograms/${chronogram_id}`)
             .set('authorization', `Bearer ${access_token}`)
             .send(invalid_payload);
           expect(response.status).toBe(400);
         }
-      });
-    });
-
-    describe('Missing fields validation', () => {
-      it('Should return 400 if title is missing', async () => {
-        const invalid_payloads = [
-          {
-            description: 'Detalhes do cronograma alterado',
-            startDate: '2023-01-01',
-            endDate: '2023-12-31',
-            tasks: [
-              { name: 'Task 1', completed: true },
-              { name: 'Task 2', completed: true }
-            ]
-          }
-        ];
-        for (const invalid_payload of invalid_payloads) {
-          const response = await request(app)
-            .put(`/chronogram/${chronogram_id}`)
-            .set('authorization', `Bearer ${access_token}`)
-            .send(invalid_payload);
-          expect(response.status).toBe(400);
-        }
-      });
-
-      it('Should return 400 if startDate is missing', async () => {
-        const invalid_payloads = [
-          {
-            title: 'Cronograma Alterado',
-            description: 'Detalhes do cronograma alterado',
-            endDate: '2023-12-31',
-            tasks: [
-              { name: 'Task 1', completed: true },
-              { name: 'Task 2', completed: true }
-            ]
-          }
-        ];
-        for (const invalid_payload of invalid_payloads) {
-          const response = await request(app)
-            .put(`/chronogram/${chronogram_id}`)
-            .set('authorization', `Bearer ${access_token}`)
-            .send(invalid_payload);
-          expect(response.status).toBe(400);
-        }
-      });
-
-      it('Should return 400 if endDate is missing', async () => {
-        const invalid_payload = {
-          title: 'Cronograma Alterado',
-          description: 'Detalhes do cronograma alterado',
-          startDate: '2023-01-01',
-          tasks: [
-            { name: 'Task 1', completed: true },
-            { name: 'Task 2', completed: true }
-          ]
-        };
-        const response = await request(app)
-          .put(`/chronogram/${chronogram_id}`)
-          .set('authorization', `Bearer ${access_token}`)
-          .send(invalid_payload);
-        expect(response.status).toBe(400);
       });
     });
   });
@@ -460,7 +399,7 @@ describe('PUT /chronogram/:chronogram_id', () => {
       });
 
       const response = await request(app)
-        .put(`/chronogram/${chronogram_id}`)
+        .patch(`/chronograms/${chronogram_id}`)
         .set('authorization', `Bearer ${access_token}`)
         .send(update_payload);
 

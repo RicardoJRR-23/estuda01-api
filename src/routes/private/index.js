@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const chronogram_routes = require('./chronogram');
+const chronogram_routes = require('./chronograms');
 const users = require('./users');
 const notices = require('./notices');
 const study_modules = require('./studyModules');
@@ -11,7 +11,7 @@ const flashcardRoutes = require("./flashcards")
 // Private routes
 router.use('/users', users);
 
-router.use('/chronogram', chronogram_routes);
+router.use('/chronograms', chronogram_routes);
 
 router.use('/notices', notices);
 
