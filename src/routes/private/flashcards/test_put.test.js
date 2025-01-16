@@ -9,7 +9,7 @@ const {
   dbDisconnect
 } = require('../../../__helpers__/mongodbServer/index.js');
 
-describe('Router Tests ', () => {
+describe('PUT /flashcards/', () => {
   //Pre-requisites: User register and session simulation
   // 'src/routes/public/users/index.js'
   // 'src/routes/public/sessions/index.js'
@@ -97,232 +97,229 @@ describe('Router Tests ', () => {
     flashcard_created.length = 0;
   });
 
-  describe('PUT /flashcards/', () => {
-    describe('Success Cases', () => {
-      describe('200 - OK', () => {
-        it('should return 200, if the flashcards are updated', async () => {
+  describe('Success Cases', () => {
+    describe('200 - OK', () => {
+      it('should return 200, if the flashcards are updated', async () => {
+        const flashcards_update = {
+          question: 'Updated question ',
+          answer: 'updated answer',
+          subject: 'updated subject'
+        };
+
+        const response = await request(app)
+          .put(`/flashcards/${flashcard_created.body._id}`)
+          .set('Authorization', `Bearer ${authentication_token}`)
+          .send(flashcards_update);
+        expect(response.status).toBe(200);
+        expect(response.body.question).toBe(flashcards_update.question);
+        expect(response.body.answer).toBe(flashcards_update.answer);
+        expect(response.body.subject).toBe(flashcards_update.subject);
+      });
+      it('should update the flashcards, if there is no subject', async () => {
+        const flashcard_no_subject_created = await request(app)
+          .post('/flashcards/')
+          .set('Authorization', `Bearer ${authentication_token}`)
+          .send(flashcard_no_subject_payload);
+        const flashcards_update = {
+          question: 'Updated question ',
+          answer: 'updated answer'
+        };
+        console.log('should update the flashcards, if there is no subject');
+        const response = await request(app)
+          .put(`/flashcards/${flashcard_no_subject_created.body._id}`)
+          .set('Authorization', `Bearer ${authentication_token}`)
+          .send(flashcards_update);
+
+        expect(response.body.question).toBe(flashcards_update.question);
+        expect(response.body.answer).toBe(flashcards_update.answer);
+      });
+      describe('Missing Fields', () => {
+        it('Should return 200 if subject is missing, but the returned object has a null subject', async () => {
           const flashcards_update = {
-            question: 'Updated question ',
-            answer: 'updated answer',
-            subject: 'updated subject'
+            question: 'Updated question',
+            answer: 'updated answer'
           };
 
           const response = await request(app)
             .put(`/flashcards/${flashcard_created.body._id}`)
             .set('Authorization', `Bearer ${authentication_token}`)
             .send(flashcards_update);
+
           expect(response.status).toBe(200);
-          expect(response.body.question).toBe(flashcards_update.question);
-          expect(response.body.answer).toBe(flashcards_update.answer);
-          expect(response.body.subject).toBe(flashcards_update.subject);
-        });
-        it('should update the flashcards, if there is no subject', async () => {
-          const flashcard_no_subject_created = await request(app)
-            .post('/flashcards/')
-            .set('Authorization', `Bearer ${authentication_token}`)
-            .send(flashcard_no_subject_payload);
-          const flashcards_update = {
-            question: 'Updated question ',
-            answer: 'updated answer'
-          };
-          console.log('should update the flashcards, if there is no subject');
-          const response = await request(app)
-            .put(`/flashcards/${flashcard_no_subject_created.body._id}`)
-            .set('Authorization', `Bearer ${authentication_token}`)
-            .send(flashcards_update);
-
-          expect(response.body.question).toBe(flashcards_update.question);
-          expect(response.body.answer).toBe(flashcards_update.answer);
-        });
-        describe('Missing Fields', () => {
-          it('Should return 200 if subject is missing, but the returned object has a null subject', async () => {
-            const flashcards_update = {
-              question: 'Updated question',
-              answer: 'updated answer'
-            };
-
-            const response = await request(app)
-              .put(`/flashcards/${flashcard_created.body._id}`)
-              .set('Authorization', `Bearer ${authentication_token}`)
-              .send(flashcards_update);
-
-            expect(response.status).toBe(200);
-            expect(response.body.subject).toBe(null);
-          });
+          expect(response.body.subject).toBe(null);
         });
       });
     });
+  });
 
-    describe('Error Cases', () => {
-      describe('400 - Bad Request', () => {
-        describe('Unexpected Field Values', () => {
-          it('should return 400 if different Flashcards have an unexpected field', async () => {
-            // Invalid values for fields question and answer
-       
-              const invalid_payload_update = {
-                question: 'Updated question ',
-                answer: 'updated answer',
-                subject: 'Math',
-                invalidField: 'invalidValue'
-              };
-              const response = await request(app)
-                .put(`/flashcards/${flashcard_created.body._id}`)
-                .set('Authorization', `Bearer ${authentication_token}`)
-                .send(invalid_payload_update);
+  describe('Error Cases', () => {
+    describe('400 - Bad Request', () => {
+      describe('Unexpected Field Values', () => {
+        it('should return 400 if different Flashcards have an unexpected field', async () => {
+          // Invalid values for fields question and answer
 
-              expect(response.status).toBe(400);
-              expect(response.body.error).toEqual(expect.any(String));
-              const normalize = str => str.replace(/\.\. ?/g, '.\n'); //!Regex to organize error string message
-              console.error(normalize(response.body.error));
-            
-          });
+          const invalid_payload_update = {
+            question: 'Updated question ',
+            answer: 'updated answer',
+            subject: 'Math',
+            invalidField: 'invalidValue'
+          };
+          const response = await request(app)
+            .put(`/flashcards/${flashcard_created.body._id}`)
+            .set('Authorization', `Bearer ${authentication_token}`)
+            .send(invalid_payload_update);
 
-          it('should return 400 if different Flashcards have an invalid playload', async () => {
-            // Invalid values for fields question and answer
-            const invalidQuestions = [[], {}, null];
-            const invalidAnswers = [[], {}, null];
-            for (let i = 0; i < invalidQuestions.length; i++) {
-              const invalid_payload_update = {
-                question: invalidQuestions[i],
-                answer: invalidAnswers[i],
-                subject: 'Math'
-              };
-              const response = await request(app)
-                .put(`/flashcards/${flashcard_created.body._id}`)
-                .set('Authorization', `Bearer ${authentication_token}`)
-                .send(invalid_payload_update);
-
-              expect(response.status).toBe(400);
-              expect(response.body.error).toEqual(expect.any(String));
-              const normalize = str => str.replace(/\.\. ?/g, '.\n'); //!Regex to organize error string message
-              console.error(normalize(response.body.error));
-            }
-          });
-
-          it('should return 400 if unexpected `subject` value in form', async () => {
-            // Invalid values for fields question and answer
-            const invalidSubjects = [[], {}];
-            for (const invalidSubject of invalidSubjects) {
-              const invalid_payload_update = {
-                question: 'Updated question ',
-                answer: 'updated answer',
-                subject: invalidSubject
-              };
-
-              const response = await request(app)
-                .put(`/flashcards/${flashcard_created.body._id}`)
-                .set('Authorization', `Bearer ${authentication_token}`)
-                .send(invalid_payload_update);
-
-              expect(response.status).toBe(400);
-              expect(response.body.error).toEqual(expect.any(String));
-              const normalize = str => str.replace(/\.\. ?/g, '.\n'); //!Regex to organize error string message
-              console.error(normalize(response.body.error));
-            }
-          });
+          expect(response.status).toBe(400);
+          expect(response.body.error).toEqual(expect.any(String));
+          const normalize = str => str.replace(/\.\. ?/g, '.\n'); //!Regex to organize error string message
+          console.error(normalize(response.body.error));
         });
 
-        describe('Missing Fields', () => {
-          it('Should return 400 if question is missing', async () => {
-            const flashcards_update = {
+        it('should return 400 if different Flashcards have an invalid playload', async () => {
+          // Invalid values for fields question and answer
+          const invalidQuestions = [[], {}, null];
+          const invalidAnswers = [[], {}, null];
+          for (let i = 0; i < invalidQuestions.length; i++) {
+            const invalid_payload_update = {
+              question: invalidQuestions[i],
+              answer: invalidAnswers[i],
+              subject: 'Math'
+            };
+            const response = await request(app)
+              .put(`/flashcards/${flashcard_created.body._id}`)
+              .set('Authorization', `Bearer ${authentication_token}`)
+              .send(invalid_payload_update);
+
+            expect(response.status).toBe(400);
+            expect(response.body.error).toEqual(expect.any(String));
+            const normalize = str => str.replace(/\.\. ?/g, '.\n'); //!Regex to organize error string message
+            console.error(normalize(response.body.error));
+          }
+        });
+
+        it('should return 400 if unexpected `subject` value in form', async () => {
+          // Invalid values for fields question and answer
+          const invalidSubjects = [[], {}];
+          for (const invalidSubject of invalidSubjects) {
+            const invalid_payload_update = {
+              question: 'Updated question ',
               answer: 'updated answer',
-              subject: 'updated subject'
+              subject: invalidSubject
             };
 
             const response = await request(app)
               .put(`/flashcards/${flashcard_created.body._id}`)
               .set('Authorization', `Bearer ${authentication_token}`)
-              .send(flashcards_update);
+              .send(invalid_payload_update);
 
             expect(response.status).toBe(400);
-            console.error(response.body.error);
-          });
-          it('Should return 400 if answer is missing', async () => {
-            const flashcards_update = {
-              question: 'Updated question',
-              subject: 'updated subject'
-            };
-
-            const response = await request(app)
-              .put(`/flashcards/${flashcard_created.body._id}`)
-              .set('Authorization', `Bearer ${authentication_token}`)
-              .send(flashcards_update);
-
-            expect(response.status).toBe(400);
-            console.error(response.body.error);
-          });
+            expect(response.body.error).toEqual(expect.any(String));
+            const normalize = str => str.replace(/\.\. ?/g, '.\n'); //!Regex to organize error string message
+            console.error(normalize(response.body.error));
+          }
         });
       });
-      describe('401 - Unauthorized', () => {
-        it('should return 401 if the user is not authenticated', async () => {
-          const response = await request(app)
-            .put(`/flashcards/${flashcard_created.body._id}`)
-            .send(flashcard_payload);
-          expect(response.status).toBe(401);
-          expect(response.body.error).toBe('Token não foi enviado.');
-        });
-        it('should return 401 if the user is not authorized', async () => {
-          const invalid_token = 'invalid_token';
-          const response = await request(app)
-            .put(`/flashcards/${flashcard_created.body._id}`)
-            .set('Authorization', `Bearer ${invalid_token}`)
-            .send(flashcard_payload);
-          expect(response.status).toBe(401);
-          expect(response.body.error).toBe('Token inválido.');
-        });
-      });
-      describe('404 - Not Found', () => {
-        it('should return 404 if the flashcard with the given ID is not found', async () => {
+
+      describe('Missing Fields', () => {
+        it('Should return 400 if question is missing', async () => {
           const flashcards_update = {
-            question: 'Updated question ',
             answer: 'updated answer',
             subject: 'updated subject'
           };
 
-          const response = await request(app)
-            .put(`/flashcards/098765432167890543215678`)
-            .set('Authorization', `Bearer ${authentication_token}`)
-            .send(flashcards_update);
-          expect(response.status).toBe(404);
-          expect(response.body.error).toBe(messages.flashcardNotFound);
-        });
-
-        it('Should return 404 if the flashcard id is found but does not belong to the authenticated user', async () => {
-          const flashcards_update = {
-            question: 'Updated question ',
-            answer: 'updated answer',
-            subject: 'updated subject'
-          };
-
-          const response = await request(app)
-            .put(`/flashcards/${flashcard_created.body._id}`)
-            .set('authorization', `Bearer ${jhon_doe_access_token}`)
-            .send(flashcards_update);
-          expect(response.status).toBe(404);
-        });
-      });
-      describe('500 - Internal Server Error', () => {
-        it('should return 500 if an internal server error occurs', async () => {
-          jest.spyOn(Flashcard, 'findOneAndUpdate').mockImplementation(() => {
-            throw new Error('Unexpected Error');
-          });
-          // Mock of the model return (see example in the file'src/models/Flashcards/index.js')
-
-          const flashcards_update = {
-            question: 'Updated question ',
-            answer: 'updated answer',
-            subject: 'updated subject'
-          };
           const response = await request(app)
             .put(`/flashcards/${flashcard_created.body._id}`)
             .set('Authorization', `Bearer ${authentication_token}`)
             .send(flashcards_update);
 
-          expect(response.status).toBe(500);
-          expect(response.body.error).toBe(
-            'Ocorreu um erro inesperado. Tente novamente mais tarde.'
-          );
+          expect(response.status).toBe(400);
+          console.error(response.body.error);
         });
+        it('Should return 400 if answer is missing', async () => {
+          const flashcards_update = {
+            question: 'Updated question',
+            subject: 'updated subject'
+          };
+
+          const response = await request(app)
+            .put(`/flashcards/${flashcard_created.body._id}`)
+            .set('Authorization', `Bearer ${authentication_token}`)
+            .send(flashcards_update);
+
+          expect(response.status).toBe(400);
+          console.error(response.body.error);
+        });
+      });
+    });
+    describe('401 - Unauthorized', () => {
+      it('should return 401 if the user is not authenticated', async () => {
+        const response = await request(app)
+          .put(`/flashcards/${flashcard_created.body._id}`)
+          .send(flashcard_payload);
+        expect(response.status).toBe(401);
+        expect(response.body.error).toBe('Token não foi enviado.');
+      });
+      it('should return 401 if the user is not authorized', async () => {
+        const invalid_token = 'invalid_token';
+        const response = await request(app)
+          .put(`/flashcards/${flashcard_created.body._id}`)
+          .set('Authorization', `Bearer ${invalid_token}`)
+          .send(flashcard_payload);
+        expect(response.status).toBe(401);
+        expect(response.body.error).toBe('Token inválido.');
+      });
+    });
+    describe('404 - Not Found', () => {
+      it('should return 404 if the flashcard with the given ID is not found', async () => {
+        const flashcards_update = {
+          question: 'Updated question ',
+          answer: 'updated answer',
+          subject: 'updated subject'
+        };
+
+        const response = await request(app)
+          .put(`/flashcards/098765432167890543215678`)
+          .set('Authorization', `Bearer ${authentication_token}`)
+          .send(flashcards_update);
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe(messages.flashcardNotFound);
+      });
+
+      it('Should return 404 if the flashcard id is found but does not belong to the authenticated user', async () => {
+        const flashcards_update = {
+          question: 'Updated question ',
+          answer: 'updated answer',
+          subject: 'updated subject'
+        };
+
+        const response = await request(app)
+          .put(`/flashcards/${flashcard_created.body._id}`)
+          .set('authorization', `Bearer ${jhon_doe_access_token}`)
+          .send(flashcards_update);
+        expect(response.status).toBe(404);
+      });
+    });
+    describe('500 - Internal Server Error', () => {
+      it('should return 500 if an internal server error occurs', async () => {
+        jest.spyOn(Flashcard, 'findOneAndUpdate').mockImplementation(() => {
+          throw new Error('Unexpected Error');
+        });
+        // Mock of the model return (see example in the file'src/models/Flashcards/index.js')
+
+        const flashcards_update = {
+          question: 'Updated question ',
+          answer: 'updated answer',
+          subject: 'updated subject'
+        };
+        const response = await request(app)
+          .put(`/flashcards/${flashcard_created.body._id}`)
+          .set('Authorization', `Bearer ${authentication_token}`)
+          .send(flashcards_update);
+
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe(
+          'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+        );
       });
     });
   });
