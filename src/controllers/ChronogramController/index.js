@@ -235,7 +235,6 @@ const patchController = async (req, res) => {
     }
 
     const response = await parcialUpdateService(chronogram_id, update_payload);
-    console.info('Chronogram updated successfully.');
     return res.status(200).json(response);
   } catch (error) {
     console.error(error);

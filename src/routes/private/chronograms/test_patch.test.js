@@ -99,14 +99,7 @@ describe('patch /chronograms/:chronogram_id', () => {
     await Chronogram.deleteMany({});
   });
 
-  /**
-   * Success cases
-   * *200
-   */
-
   describe('Success cases, response with status 200', () => {
-    //*200
-
     it('Should return 200 if updated a chronogram successfully, with all fields filled', async () => {
       //update the chronogram
 
@@ -169,92 +162,38 @@ describe('patch /chronograms/:chronogram_id', () => {
     });
   });
 
-  describe('Error cases, response with status 404', () => {
-    //! 404
-
-    it('Should return 404 if the chronogram id is not found', async () => {
-      const response = await request(app)
-        .patch('/chronograms/63f9e18e68d8d830f8e4f1a3') // Invalid chronogram id
-        .set('authorization', `Bearer ${access_token}`)
-        .send(update_payload);
-      expect(response.status).toBe(404);
-    });
-
-    //! 404
-
-    it('Should return 404 if the chronogram id is found but does not belong to the authenticated user', async () => {
-      const response = await request(app)
-        .patch(`/chronograms/${chronogram_id}`)
-        .set('authorization', `Bearer ${jhon_doe_access_token}`) //
-        .send(update_payload);
-      expect(response.status).toBe(404);
-    });
-  });
-
-  describe('Error cases, response with status 400', () => {
-    describe(' Invalid values ​​for fields', () => {
-      it('Should return 400 if the the required "title" field  is send in a request with missing or wrongly filled, or type other then String', async () => {
-        // Invalid values ​​for fields
-        const invalid_titles = [null, 123, [], {}, 0, false, ''];
-
-        for (const invalid_title of invalid_titles) {
-          const invalid_payload = {
-            title: invalid_title,
-            description: 'Detalhes do cronograma alterado',
-            startDate: '2022-12-31',
-            endDate: '2023-12-31',
-            tasks: [
-              { name: 'Task 1', completed: true },
-              { name: 'Task 2', completed: true }
-            ]
-          };
-          const response = await request(app)
-            .patch(`/chronograms/${chronogram_id}`)
-            .set('authorization', `Bearer ${access_token}`)
-            .send(invalid_payload);
-          expect(response.status).toBe(400);
-        }
-      });
-
-      describe('Date validation', () => {
-        it('Should return 400 if the "endDate" is before "startDate"', async () => {
-          const invalid_payload = {
-            title: 'Cronograma Alterado',
-            description: 'Detalhes do cronograma alterado',
-            startDate: '2023-01-01',
-            endDate: '2022-12-31',
-            tasks: [
-              { name: 'Task 1', completed: true },
-              { name: 'Task 2', completed: true }
-            ]
-          };
-          const response = await request(app)
-            .patch(`/chronograms/${chronogram_id}`)
-            .set('authorization', `Bearer ${access_token}`)
-            .send(invalid_payload);
-          expect(response.status).toBe(400);
-          expect(response.body).toMatchObject({
-            error: 'A data final deve ser maior que a data inicial.'
-          });
+  describe('Error cases', () => {
+    describe('400 - Bad request', () => {
+      describe(' Invalid values for fields', () => {
+        it('Should return 400 if the the required "title" field  is send in a request with missing or wrongly filled, or type other then String', async () => {
+          // Invalid values ​​for fields
+          const invalid_titles = [null, 123, [], {}, 0, false, ''];
+  
+          for (const invalid_title of invalid_titles) {
+            const invalid_payload = {
+              title: invalid_title,
+              description: 'Detalhes do cronograma alterado',
+              startDate: '2022-12-31',
+              endDate: '2023-12-31',
+              tasks: [
+                { name: 'Task 1', completed: true },
+                { name: 'Task 2', completed: true }
+              ]
+            };
+            const response = await request(app)
+              .patch(`/chronograms/${chronogram_id}`)
+              .set('authorization', `Bearer ${access_token}`)
+              .send(invalid_payload);
+            expect(response.status).toBe(400);
+          }
         });
-
-        it('Should return 400 if the the required "startDate" field  is send in a request with missing or wrongly filled, or invalid Date form (ISO 8601 - YYYY-MM-DD)', async () => {
-          // Invalid values ​​for fields startDate
-          const invalid_dates = [
-            null,
-            123,
-            [],
-            {},
-            '15-12-2022', // Invalid format
-            '2023-01-32', // Invalid day
-            '2023-13-31' // Invalid month
-          ];
-
-          for (const invalid_date of invalid_dates) {
+  
+        describe('Date validation', () => {
+          it('Should return 400 if the "endDate" is before "startDate"', async () => {
             const invalid_payload = {
               title: 'Cronograma Alterado',
               description: 'Detalhes do cronograma alterado',
-              startDate: invalid_date,
+              startDate: '2023-01-01',
               endDate: '2022-12-31',
               tasks: [
                 { name: 'Task 1', completed: true },
@@ -266,28 +205,130 @@ describe('patch /chronograms/:chronogram_id', () => {
               .set('authorization', `Bearer ${access_token}`)
               .send(invalid_payload);
             expect(response.status).toBe(400);
-          }
-        });
-        it('Should return 400 if the the required "endDate" field  is send in a request with missing or wrongly filled, or invalid Date form (ISO 8601 - YYYY-MM-DD)', async () => {
-          // Invalid values ​​for fields startDate
-          const invalid_dates = [
-            null,
-            123,
-            [],
-            {},
-            '15-12-2022', // Invalid format
-            '2023-01-32', // Invalid day
-            '2023-13-31' // Invalid month
-          ];
-
-          for (const invalid_date of invalid_dates) {
+            expect(response.body).toMatchObject({
+              error: 'A data final deve ser maior que a data inicial.'
+            });
+          });
+  
+          it('Should return 400 if the the required "startDate" field  is send in a request with missing or wrongly filled, or invalid Date form (ISO 8601 - YYYY-MM-DD)', async () => {
+            // Invalid values ​​for fields startDate
+            const invalid_dates = [
+              null,
+              123,
+              [],
+              {},
+              '15-12-2022', // Invalid format
+              '2023-01-32', // Invalid day
+              '2023-13-31' // Invalid month
+            ];
+  
+            for (const invalid_date of invalid_dates) {
+              const invalid_payload = {
+                title: 'Cronograma Alterado',
+                description: 'Detalhes do cronograma alterado',
+                startDate: invalid_date,
+                endDate: '2022-12-31',
+                tasks: [
+                  { name: 'Task 1', completed: true },
+                  { name: 'Task 2', completed: true }
+                ]
+              };
+              const response = await request(app)
+                .patch(`/chronograms/${chronogram_id}`)
+                .set('authorization', `Bearer ${access_token}`)
+                .send(invalid_payload);
+              expect(response.status).toBe(400);
+            }
+          });
+          it('Should return 400 if the the required "endDate" field  is send in a request with missing or wrongly filled, or invalid Date form (ISO 8601 - YYYY-MM-DD)', async () => {
+            // Invalid values ​​for fields startDate
+            const invalid_dates = [
+              null,
+              123,
+              [],
+              {},
+              '15-12-2022', // Invalid format
+              '2023-01-32', // Invalid day
+              '2023-13-31' // Invalid month
+            ];
+  
+            for (const invalid_date of invalid_dates) {
+              const invalid_payload = {
+                title: 'Cronograma Alterado',
+                description: 'Detalhes do cronograma alterado',
+                startDate: '2022-12-31',
+                endDate: invalid_date,
+                tasks: [
+                  { name: 'Task 1', completed: true },
+                  { name: 'Task 2', completed: true }
+                ]
+              };
+              const response = await request(app)
+                .patch(`/chronograms/${chronogram_id}`)
+                .set('authorization', `Bearer ${access_token}`)
+                .send(invalid_payload);
+              expect(response.status).toBe(400);
+            }
+          });
+          it('Should return 400 if the "endDate" is not a valid date format (ISO 8601 - YYYY-MM-DD)', async () => {
             const invalid_payload = {
               title: 'Cronograma Alterado',
               description: 'Detalhes do cronograma alterado',
-              startDate: '2022-12-31',
-              endDate: invalid_date,
+              startDate: '01-2022-01',
+              endDate: '2023-12-31', //! Invalid format
               tasks: [
                 { name: 'Task 1', completed: true },
+                { name: 'Task 2', completed: true }
+              ]
+            };
+  
+            const date_regex = /^\d{4}-\d{2}-\d{2}$/;
+  
+            expect(date_regex.test(invalid_payload.startDate)).toBe(false);
+            expect(date_regex.test(invalid_payload.endDate)).toBe(true);
+  
+            const response = await request(app)
+              .patch(`/chronograms/${chronogram_id}`)
+              .set('authorization', `Bearer ${access_token}`)
+              .send(invalid_payload);
+            expect(response.status).toBe(400);
+          });
+          it('Should return 400 if the "endDate" is not a valid date format (ISO 8601 - YYYY-MM-DD)', async () => {
+            const invalid_payload = {
+              title: 'Cronograma Alterado',
+              description: 'Detalhes do cronograma alterado',
+              startDate: '2023-01-01',
+              endDate: '20-2022-31', //! Invalid format
+              tasks: [
+                { name: 'Task 1', completed: true },
+                { name: 'Task 2', completed: true }
+              ]
+            };
+  
+            const date_regex = /^\d{4}-\d{2}-\d{2}$/;
+  
+            expect(date_regex.test(invalid_payload.startDate)).toBe(true);
+            expect(date_regex.test(invalid_payload.endDate)).toBe(false);
+  
+            const response = await request(app)
+              .patch(`/chronograms/${chronogram_id}`)
+              .set('authorization', `Bearer ${access_token}`)
+              .send(invalid_payload);
+            expect(response.status).toBe(400);
+          });
+        });
+  
+        it('Should return 400 if tasks "name" field is wrongly filled', async () => {
+          const invalid_names = [null, 123, [], {}, 0, false, ''];
+  
+          for (const invalid_name of invalid_names) {
+            const invalid_payload = {
+              title: 'Cronograma Alterado',
+              description: 'Detalhes do cronograma alterado',
+              startDate: '2023-01-01',
+              startDate: '2023-12-31',
+              tasks: [
+                { name: invalid_name, completed: true },
                 { name: 'Task 2', completed: true }
               ]
             };
@@ -298,115 +339,68 @@ describe('patch /chronograms/:chronogram_id', () => {
             expect(response.status).toBe(400);
           }
         });
-        it('Should return 400 if the "endDate" is not a valid date format (ISO 8601 - YYYY-MM-DD)', async () => {
-          const invalid_payload = {
-            title: 'Cronograma Alterado',
-            description: 'Detalhes do cronograma alterado',
-            startDate: '01-2022-01',
-            endDate: '2023-12-31', //! Invalid format
-            tasks: [
-              { name: 'Task 1', completed: true },
-              { name: 'Task 2', completed: true }
-            ]
-          };
-
-          const date_regex = /^\d{4}-\d{2}-\d{2}$/;
-
-          expect(date_regex.test(invalid_payload.startDate)).toBe(false);
-          expect(date_regex.test(invalid_payload.endDate)).toBe(true);
-
-          const response = await request(app)
-            .patch(`/chronograms/${chronogram_id}`)
-            .set('authorization', `Bearer ${access_token}`)
-            .send(invalid_payload);
-          expect(response.status).toBe(400);
-        });
-        it('Should return 400 if the "endDate" is not a valid date format (ISO 8601 - YYYY-MM-DD)', async () => {
-          const invalid_payload = {
-            title: 'Cronograma Alterado',
-            description: 'Detalhes do cronograma alterado',
-            startDate: '2023-01-01',
-            endDate: '20-2022-31', //! Invalid format
-            tasks: [
-              { name: 'Task 1', completed: true },
-              { name: 'Task 2', completed: true }
-            ]
-          };
-
-          const date_regex = /^\d{4}-\d{2}-\d{2}$/;
-
-          expect(date_regex.test(invalid_payload.startDate)).toBe(true);
-          expect(date_regex.test(invalid_payload.endDate)).toBe(false);
-
-          const response = await request(app)
-            .patch(`/chronograms/${chronogram_id}`)
-            .set('authorization', `Bearer ${access_token}`)
-            .send(invalid_payload);
-          expect(response.status).toBe(400);
+  
+        it('Should return 400 if tasks "completed" field is wrongly filled', async () => {
+          const invalid_complete_values = [null, 123, [], {}, ''];
+  
+          for (const invalid_complete_value of invalid_complete_values) {
+            const invalid_payload = {
+              title: 'Cronograma Alterado',
+              description: 'Detalhes do cronograma alterado',
+              startDate: '2023-01-01',
+              startDate: '2023-12-31',
+              tasks: [
+                { name: 'Task 1', completed: invalid_complete_value },
+                { name: 'Task 2', completed: true }
+              ]
+            };
+            const response = await request(app)
+              .patch(`/chronograms/${chronogram_id}`)
+              .set('authorization', `Bearer ${access_token}`)
+              .send(invalid_payload);
+            expect(response.status).toBe(400);
+          }
         });
       });
-
-      it('Should return 400 if tasks "name" field is wrongly filled', async () => {
-        const invalid_names = [null, 123, [], {}, 0, false, ''];
-
-        for (const invalid_name of invalid_names) {
-          const invalid_payload = {
-            title: 'Cronograma Alterado',
-            description: 'Detalhes do cronograma alterado',
-            startDate: '2023-01-01',
-            startDate: '2023-12-31',
-            tasks: [
-              { name: invalid_name, completed: true },
-              { name: 'Task 2', completed: true }
-            ]
-          };
-          const response = await request(app)
-            .patch(`/chronograms/${chronogram_id}`)
-            .set('authorization', `Bearer ${access_token}`)
-            .send(invalid_payload);
-          expect(response.status).toBe(400);
-        }
+    });
+  
+    describe('404 - Not found', () => {
+      it('Should return 404 if the chronogram id is not found', async () => {
+        const response = await request(app)
+          .patch('/chronograms/63f9e18e68d8d830f8e4f1a3') // Invalid chronogram id
+          .set('authorization', `Bearer ${access_token}`)
+          .send(update_payload);
+        expect(response.status).toBe(404);
       });
-
-      it('Should return 400 if tasks "completed" field is wrongly filled', async () => {
-        const invalid_complete_values = [null, 123, [], {}, ''];
-
-        for (const invalid_complete_value of invalid_complete_values) {
-          const invalid_payload = {
-            title: 'Cronograma Alterado',
-            description: 'Detalhes do cronograma alterado',
-            startDate: '2023-01-01',
-            startDate: '2023-12-31',
-            tasks: [
-              { name: 'Task 1', completed: invalid_complete_value },
-              { name: 'Task 2', completed: true }
-            ]
-          };
-          const response = await request(app)
-            .patch(`/chronograms/${chronogram_id}`)
-            .set('authorization', `Bearer ${access_token}`)
-            .send(invalid_payload);
-          expect(response.status).toBe(400);
-        }
+  
+      it('Should return 404 if the chronogram id is found but does not belong to the authenticated user', async () => {
+        const response = await request(app)
+          .patch(`/chronograms/${chronogram_id}`)
+          .set('authorization', `Bearer ${jhon_doe_access_token}`) //
+          .send(update_payload);
+        expect(response.status).toBe(404);
+      });
+    });
+  
+    
+    describe('500 - Internal Server Error', () => {
+      it('Should return 500 if an unexpected error occurs', async () => {
+        jest.spyOn(Chronogram, 'findByIdAndUpdate').mockImplementation(() => {
+          throw new Error('Unexpected Error');
+        });
+  
+        const response = await request(app)
+          .patch(`/chronograms/${chronogram_id}`)
+          .set('authorization', `Bearer ${access_token}`)
+          .send(update_payload);
+  
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe(
+          'Ocorreu um erro inesperado. Tente novamente mais tarde.'
+        );
       });
     });
   });
-  describe('Error cases, response with status 500', () => {
-    it('Should return 500 if an unexpected error occurs', async () => {
-      
-      jest.spyOn(Chronogram, 'findByIdAndUpdate').mockImplementation(() => {
-        throw new Error('Unexpected Error');
-      });
 
-      const response = await request(app)
-        .patch(`/chronograms/${chronogram_id}`)
-        .set('authorization', `Bearer ${access_token}`)
-        .send(update_payload);
-
-      expect(response.status).toBe(500);
-      expect(response.body.error).toBe(
-        'Ocorreu um erro inesperado. Tente novamente mais tarde.'
-      );
-    });
-  });
+ 
 });
